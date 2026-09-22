@@ -1,0 +1,172 @@
+<UserControl x:Class="LibOps.PresentationLayer.Views.ReaderBookDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:LibOps.PresentationLayer.ViewModels"
+             xmlns:conv="clr-namespace:LibOps.PresentationLayer.Converters"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:ReaderBookDetailViewModel}"
+             FontFamily="Segoe UI">
+
+    <UserControl.Resources>
+        <conv:BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 1. Header & Nút Quay Lại -->
+        <Grid Grid.Row="0" Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Command="{Binding BackCommand}" 
+                    Style="{StaticResource OutlineButton}" Height="36" Padding="14,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="ArrowLeft" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Text="Quay lại danh sách tra cứu" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <TextBlock Grid.Column="1" Text="THÔNG TIN CHI TIẾT ĐẦU SÁCH" FontSize="16" FontWeight="Bold" 
+                       Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="16,0,0,0"/>
+        </Grid>
+
+        <!-- 2. Thẻ Nội Dung Chi Tiết -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Border Style="{StaticResource ModernCard}" Padding="28,24" Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="240"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- CỘT BÊN TRÁI: Ảnh Bìa & Khối Giá Bìa -->
+                    <StackPanel Grid.Column="0" Margin="0,0,28,0">
+                        <!-- Khung Ảnh Bìa bo góc 8px hoàn hảo -->
+                        <Border CornerRadius="8" Background="#F1F5F9" 
+                                BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1"
+                                Height="330" Effect="{StaticResource CardShadow}">
+                            <Grid>
+                                <!-- Ảnh thực tế -->
+                                <Border CornerRadius="7"
+                                        Visibility="{Binding Book.HasCoverImage, Converter={StaticResource BoolToVisConverter}}">
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{Binding Book.CoverImagePath, Converter={StaticResource CoverImageConverter}}" Stretch="UniformToFill" />
+                                    </Border.Background>
+                                </Border>
+                                
+                                <!-- Placeholder khi chưa có ảnh -->
+                                <Border CornerRadius="7" Background="#F8FAFC"
+                                        Visibility="{Binding Book.HasCoverImage, Converter={StaticResource InverseBoolToVisConverter}}">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <iconPacks:PackIconMaterial Kind="BookOpenVariant" Width="56" Height="56" 
+                                                                    Foreground="{StaticResource SlateMutedBrush}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Không có ảnh bìa" FontSize="11.5" Foreground="{StaticResource SlateMutedBrush}" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Khối Giá Bìa & Bản Sao Dưới Ảnh -->
+                        <Border Margin="0,14,0,0" Padding="12,10" Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="8">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock Text="Giá bìa niêm yết:" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding Book.FormattedPrice}" FontWeight="Bold" FontSize="12.5" Foreground="{StaticResource BrandIndigoBrush}" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Tổng số bản sao:" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding Book.TotalQuantity, StringFormat='{}{0} cuốn'}" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- CỘT BÊN PHẢI: Bố Cục Thông Tin Chi Tiết Theo Ảnh Đính Kèm -->
+                    <StackPanel Grid.Column="1">
+                        <!-- 1. Tên Đầu Sách (H1 Lớn) -->
+                        <TextBlock Text="{Binding Book.Title}" FontSize="24" FontWeight="Bold" 
+                                   Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+
+                        <!-- 2. Tác Giả -->
+                        <TextBlock Text="{Binding Book.AuthorName, StringFormat='Tác giả: {0}'}" 
+                                   FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,16"/>
+
+                        <!-- 3. BẢNG THÔNG TIN LƯỚI 3 CỘT X 2 HÀNG (NỀN XANH NHẠT BO GÓC THEO THIẾT KẾ) -->
+                        <Border Background="#F0F7FF" BorderBrush="#E0EEFF" BorderThickness="1" CornerRadius="8" Padding="20,16" Margin="0,0,0,18">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.1*"/>
+                                    <ColumnDefinition Width="1.1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- HÀNG 1 -->
+                                <!-- Cột 0: Thể loại -->
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,14,14">
+                                    <TextBlock Text="Thể loại:" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="{Binding Book.CategoryName}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+
+                                <!-- Cột 1: Nhà xuất bản -->
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,14,14">
+                                    <TextBlock Text="Nhà xuất bản:" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="{Binding Book.PublisherName, TargetNullValue='Chưa xác định', FallbackValue='Chưa xác định'}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+
+                                <!-- Cột 2: Năm xuất bản -->
+                                <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,14">
+                                    <TextBlock Text="Năm xuất bản:" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="{Binding Book.PublishYear, TargetNullValue='—', FallbackValue='—'}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <!-- HÀNG 2 -->
+                                <!-- Cột 0: Mã ISBN -->
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,14,0">
+                                    <TextBlock Text="Mã ISBN:" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="{Binding Book.Isbn, TargetNullValue='—', FallbackValue='—'}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+
+                                <!-- Cột 1: Tình trạng -->
+                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,14,0">
+                                    <TextBlock Text="Tình trạng:" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="{Binding Book.AvailabilityStatusDisplay}" FontWeight="SemiBold" FontSize="13" Foreground="#059669" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <!-- Cột 2: Vị trí kệ (Font 16 Nổi Bật) -->
+                                <StackPanel Grid.Row="1" Grid.Column="2">
+                                    <TextBlock Text="Vị trí kệ:" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="{Binding Book.ShelfLocation, TargetNullValue='Chưa xếp vị trí', FallbackValue='Chưa xếp vị trí'}" 
+                                               FontSize="16" FontWeight="Bold" Foreground="{StaticResource BrandIndigoBrush}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- 4. KHỐI TÓM TẮT NỘI DUNG -->
+                        <TextBlock Text="Tóm tắt nội dung:" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        
+                        <Border Background="#FAFCFF" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="8" Padding="16,14">
+                            <ScrollViewer MaxHeight="220" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <TextBlock Text="{Binding Book.Summary, TargetNullValue='Hiện tại chưa có phần tóm tắt nội dung cho tài liệu này.', FallbackValue='Hiện tại chưa có phần tóm tắt nội dung cho tài liệu này.'}" 
+                                           FontSize="13.5" LineHeight="22" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap"/>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

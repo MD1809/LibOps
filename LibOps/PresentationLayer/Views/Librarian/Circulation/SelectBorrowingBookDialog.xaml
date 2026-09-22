@@ -1,0 +1,124 @@
+﻿<Window x:Class="LibOps.PresentationLayer.Views.SelectBorrowingBookDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        Title="🔍 Tra Cứu Sách Mượn Theo Độc Giả / Báo Mất Sách"
+        Width="920" Height="580"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgLightBrush}"
+        FontFamily="Segoe UI">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Tiêu đề Dialog -->
+        <Grid Grid.Row="0" Margin="0,0,0,14">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <iconPacks:PackIconMaterial Kind="AccountSearchOutline" Width="22" Height="22" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="TÌM KIẾM SÁCH ĐANG MƯỢN THEO ĐỘC GIẢ" FontSize="17" FontWeight="Bold" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock Text="Tra cứu các cuốn sách độc giả đang mượn khi mất sách, quên mã vạch hoặc cần làm thủ tục bồi thường." FontSize="12.5" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Thanh tìm kiếm -->
+        <Border Grid.Row="1" Style="{StaticResource ModernCard}" Padding="14" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Thông tin độc giả: " FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <TextBox Grid.Column="1" Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource ModernTextBox}" Height="36">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Return" Command="{Binding SearchCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
+                <Button Grid.Column="2" Style="{StaticResource PrimaryGradientButton}" Margin="10,0,0,0" Height="36" Padding="16,0" Command="{Binding SearchCommand}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="Magnify" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Tìm Kiếm" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Danh sách sách mượn của độc giả -->
+        <Border Grid.Row="2" Style="{StaticResource ModernCard}" Padding="0" ClipToBounds="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Dải trạng thái thông báo -->
+                <Border Grid.Row="0" Background="#F1F5F9" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="0,0,0,1" Padding="12,8">
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="InformationOutline" Width="15" Height="15" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="{Binding StatusMessage}" FontSize="12.5" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Bảng dữ liệu -->
+                <DataGrid Grid.Row="1" ItemsSource="{Binding BorrowingBooks}" SelectedItem="{Binding SelectedBook, Mode=TwoWay}"
+                          Style="{StaticResource ModernDataGrid}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Mã Phiếu" Binding="{Binding SlipCode}" Width="120" />
+                        <DataGridTextColumn Header="Mã Vạch" Binding="{Binding Barcode}" Width="120" />
+                        <DataGridTextColumn Header="Tựa Đề Sách" Binding="{Binding Title}" Width="*" />
+                        <DataGridTextColumn Header="Giá Bìa" Binding="{Binding BookPrice, StringFormat={}{0:N0} đ}" Width="90" />
+                        <DataGridTextColumn Header="Ngày Mượn" Binding="{Binding BorrowDate, StringFormat=dd/MM/yyyy}" Width="95" />
+                        <DataGridTextColumn Header="Hạn Trả" Binding="{Binding DueDate, StringFormat=dd/MM/yyyy}" Width="95" />
+                        <DataGridTextColumn Header="Quá Hạn" Binding="{Binding OverdueDays}" Width="75" />
+                        <DataGridTextColumn Header="Phạt Trễ" Binding="{Binding OverdueFine, StringFormat={}{0:N0} đ}" Width="90" />
+                        <DataGridTextColumn Header="Tên Độc Giả" Binding="{Binding MemberFullName}" Width="140" />
+                        <DataGridTextColumn Header="Mã Thẻ" Binding="{Binding MemberCardCode}" Width="100" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Thao tác dưới đáy -->
+        <Grid Grid.Row="3" Margin="0,14,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="💡 Mẹo: Chọn 1 cuốn sách trong bảng rồi bấm 'Chọn Trả Sách' (nguyên vẹn) hoặc 'Báo Mất Sách' (phạt 200% giá bìa)." 
+                       FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontStyle="Italic" TextWrapping="Wrap" />
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Style="{StaticResource OutlineButton}" Height="38" Padding="16,0" Margin="0,0,10,0" Command="{Binding CancelCommand}" IsCancel="True">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="CloseCircleOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Đóng (Esc)" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource DangerButton}" Height="38" Padding="16,0" Margin="0,0,10,0" Command="{Binding ReportLostCommand}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="AlertOctagramOutline" Width="15" Height="15" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Báo Mất Sách (200%)" VerticalAlignment="Center" FontWeight="SemiBold" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource SuccessButton}" Height="38" Padding="18,0" Command="{Binding SelectReturnCommand}" IsDefault="True">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="BookCheckOutline" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Chọn Trả Sách" VerticalAlignment="Center" FontWeight="Bold" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

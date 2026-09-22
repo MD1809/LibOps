@@ -1,0 +1,256 @@
+﻿<Window x:Class="LibOps.PresentationLayer.Views.ReaderDashboardView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:LibOps.PresentationLayer.ViewModels"
+        xmlns:views="clr-namespace:LibOps.PresentationLayer.Views"
+        xmlns:converters="clr-namespace:LibOps.PresentationLayer.Converters"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        mc:Ignorable="d"
+        Title="LibOps - Cổng Thông Tin Độc Giả Thư Viện" 
+        Height="780" Width="1280"
+        MinHeight="680" MinWidth="1000"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI"
+        Background="{StaticResource BgLightBrush}">
+
+    <Window.Resources>
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+
+        <!-- Dynamic DataTemplates for Reader Modules -->
+        <DataTemplate DataType="{x:Type vm:ReaderHomeViewModel}">
+            <views:ReaderHomeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReaderOpacSearchViewModel}">
+            <views:ReaderOpacSearchView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReaderBookDetailViewModel}">
+            <views:ReaderBookDetailView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReaderLoansViewModel}">
+            <views:ReaderLoansView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReaderFinanceViewModel}">
+            <views:ReaderFinanceView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReaderSelfServiceRequestsViewModel}">
+            <views:ReaderSelfServiceRequestsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReaderProfileViewModel}">
+            <views:ReaderProfileView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- SIDEBAR MENU BÊN TRÁI -->
+        <Border Grid.Column="0" Width="{Binding SidebarWidth}" Background="{StaticResource SlateDarkBrush}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Brand Header -->
+                <Border Grid.Row="0" Padding="14,20" BorderBrush="#1E293B" BorderThickness="0,0,0,1">
+                    <Grid HorizontalAlignment="Center">
+                        <!-- Khi mở rộng -->
+                        <StackPanel Orientation="Horizontal" 
+                                    Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisConverter}}">
+                            <iconPacks:PackIconMaterial Kind="Library" 
+                                                        Width="26" Height="26" 
+                                                        VerticalAlignment="Center" 
+                                                        Foreground="{StaticResource BrandPinkBrush}" 
+                                                        Margin="0,0,10,0" />
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="LIBOPS" FontSize="20" FontWeight="ExtraBold" Foreground="White" />
+                                <TextBlock Text="TRI THỨC NHÂN LOẠI" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrandPinkBrush}" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Khi thu gọn -->
+                        <iconPacks:PackIconMaterial Kind="Library" 
+                                                    Width="22" Height="22" 
+                                                    HorizontalAlignment="Center" 
+                                                    Foreground="{StaticResource BrandPinkBrush}" 
+                                                    ToolTip="LibOps - Tri Thức Nhân Loại"
+                                                    Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource BoolToVisConverter}}" />
+                    </Grid>
+                </Border>
+
+                <!-- Danh sách Menu Items -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="0,12">
+                        <!-- 1. Trang Chủ (Discovery Hub) -->
+                        <RadioButton Style="{StaticResource SidebarNavButton}"
+                                     GroupName="ReaderSidebarNavGroup"
+                                     ToolTip="Trang Chủ"
+                                     IsChecked="True"
+                                     Command="{Binding NavigateHomeCommand}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Grid Width="24">
+                                    <iconPacks:PackIconMaterial Kind="HomeOutline" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <TextBlock Text="Trang Chủ" Margin="10,0,0,0" VerticalAlignment="Center"
+                                           Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisConverter}}" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <!-- 2. Tra Cứu Sách (OPAC Catalog) -->
+                        <RadioButton Style="{StaticResource SidebarNavButton}"
+                                     GroupName="ReaderSidebarNavGroup"
+                                     ToolTip="Tra Cứu Sách"
+                                     Command="{Binding NavigateOpacCommand}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Grid Width="24">
+                                    <iconPacks:PackIconMaterial Kind="BookSearch" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <TextBlock Text="Tra Cứu Sách" Margin="10,0,0,0" VerticalAlignment="Center"
+                                           Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisConverter}}" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <!-- 3. Mượn Và Trả Sách -->
+                        <RadioButton Style="{StaticResource SidebarNavButton}"
+                                     GroupName="ReaderSidebarNavGroup"
+                                     ToolTip="Mượn Và Trả Sách"
+                                     Command="{Binding NavigateLoansCommand}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Grid Width="24">
+                                    <iconPacks:PackIconMaterial Kind="BookSync" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <TextBlock Text="Mượn Và Trả Sách" Margin="10,0,0,0" VerticalAlignment="Center"
+                                           Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisConverter}}" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <Border Height="1" Background="#1E293B" Margin="16,6" />
+
+                        <!-- 3. Thẻ Thư viện -->
+                        <RadioButton Style="{StaticResource SidebarNavButton}"
+                                     GroupName="ReaderSidebarNavGroup"
+                                     ToolTip="Thẻ Thư viện"
+                                     Command="{Binding NavigateFinanceCommand}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Grid Width="24">
+                                    <iconPacks:PackIconMaterial Kind="CreditCardChipOutline" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <TextBlock Text="Thẻ Thư viện" Margin="10,0,0,0" VerticalAlignment="Center"
+                                           Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisConverter}}" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <!-- 4. Yêu Cầu Tự Phục Vụ -->
+                        <RadioButton Style="{StaticResource SidebarNavButton}"
+                                     GroupName="ReaderSidebarNavGroup"
+                                     ToolTip="Yêu Cầu Tự Phục Vụ"
+                                     Command="{Binding NavigateRequestsCommand}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Grid Width="24">
+                                    <iconPacks:PackIconMaterial Kind="HandHeartOutline" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <TextBlock Text="Yêu Cầu Tự Phục Vụ" Margin="10,0,0,0" VerticalAlignment="Center"
+                                           Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisConverter}}" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <!-- 5. Thông tin cá nhân -->
+                        <RadioButton Style="{StaticResource SidebarNavButton}"
+                                     GroupName="ReaderSidebarNavGroup"
+                                     ToolTip="Thông tin cá nhân"
+                                     Command="{Binding NavigateProfileCommand}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Grid Width="24">
+                                    <iconPacks:PackIconMaterial Kind="AccountDetailsOutline" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <TextBlock Text="Thông tin cá nhân" Margin="10,0,0,0" VerticalAlignment="Center"
+                                           Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisConverter}}" />
+                            </StackPanel>
+                        </RadioButton>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Footer Sidebar: Nút Đăng Xuất -->
+                <Border Grid.Row="2" Padding="10,14" BorderBrush="#1E293B" BorderThickness="0,1,0,0">
+                    <Button Style="{StaticResource DangerButton}"
+                            ToolTip="Đăng Xuất Khỏi Cổng Độc Giả"
+                            Height="36"
+                            Command="{Binding LogoutCommand}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Grid Width="24">
+                                <iconPacks:PackIconMaterial Kind="Logout" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid>
+                            <TextBlock Text="Đăng Xuất" Margin="6,0,0,0" VerticalAlignment="Center"
+                                       Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisConverter}}" />
+                        </StackPanel>
+                    </Button>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- KHU VỰC NỘI DUNG CHÍNH BÊN PHẢI -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="64" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Top Header Bar -->
+            <Border Grid.Row="0" Background="{StaticResource SlateDarkBrush}" BorderThickness="0,0,0,1" BorderBrush="{StaticResource SlateDarkBrush}" Padding="20,0" Effect="{StaticResource CardShadow}">
+                <Grid>
+                    <!-- Nút Hamburger & Tiêu đề -->
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Button Command="{Binding ToggleSidebarCommand}"
+                                ToolTip="{Binding SidebarToggleToolTip}"
+                                Cursor="Hand"
+                                Margin="0,0,14,0"
+                                Background="Transparent" 
+                                BorderThickness="0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" Padding="4">
+                                        <iconPacks:PackIconMaterial Kind="Menu" 
+                                                                    Foreground="{StaticResource BgLightBrush}" 
+                                                                    Width="22" Height="22" 
+                                                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="0.8" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <TextBlock Text="CỔNG THÔNG TIN ĐỘC GIẢ - LIBOPS" FontSize="14" FontWeight="Bold" Foreground="{StaticResource BgLightBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- User Profile (Chỉ hiện tên độc giả theo yêu cầu) -->
+                    <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                        <Border Background="#EEF2FF" CornerRadius="12" Padding="12,6">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="AccountCircle" 
+                                                            Width="16" Height="16" 
+                                                            Foreground="{StaticResource TextPrimaryBrush}" 
+                                                            VerticalAlignment="Center" 
+                                                            Margin="0,0,6,0" />
+                                <TextBlock Text="{Binding MemberDisplayName}" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Dynamic Content Control -->
+            <ContentControl Grid.Row="1" Content="{Binding CurrentView}" Margin="18" />
+        </Grid>
+    </Grid>
+</Window>

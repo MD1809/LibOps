@@ -1,0 +1,324 @@
+<UserControl x:Class="LibOps.PresentationLayer.Views.ReaderFinanceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:LibOps.PresentationLayer.ViewModels"
+             xmlns:converters="clr-namespace:LibOps.PresentationLayer.Converters"
+             xmlns:controls="clr-namespace:LibOps.PresentationLayer.Controls"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:ReaderFinanceViewModel}"
+             FontFamily="Segoe UI">
+
+    <UserControl.Resources>
+        <!-- Style căn lề ô DataGrid -->
+        <Style x:Key="CenterAlignedCell" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="RightAlignedCell" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="THẺ THƯ VIỆN" FontSize="19" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="Quản lý thẻ thư viện điện tử, gia hạn thẻ, nạp tiền cọc trực tuyến và theo dõi lịch sử dòng tiền" FontSize="12.5" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0" />
+            </StackPanel>
+
+            <Button Grid.Column="1" Command="{Binding RefreshCommand}" Style="{StaticResource OutlineButton}" Height="34" Padding="12,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="Refresh" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Text="Làm mới" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Body: 2 Columns -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="410"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- CỘT TRÁI: GIAO DIỆN THẺ THƯ VIỆN & CÁC NÚT CHỨC NĂNG -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,16,0">
+                <StackPanel>
+                    
+                    <!-- THẺ THƯ VIỆN GRAPHIC DESIGN -->
+                    <Border CornerRadius="16" Padding="22,20" Margin="0,0,0,16" Effect="{StaticResource FloatingShadow}">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#0F172A" Offset="0.0"/>
+                                <GradientStop Color="#1E293B" Offset="0.5"/>
+                                <GradientStop Color="#312E81" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        
+                        <Grid MinHeight="175">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Hàng 1: [ LIBOPS - Thẻ thư viện điện tử ] -->
+                            <Grid Grid.Row="0" Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="BookOpenPageVariantOutline" Width="18" Height="18" Foreground="#38BDF8" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="LIBOPS - Thẻ thư viện điện tử" FontSize="13" FontWeight="Bold" Foreground="#F1F5F9" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <Border Grid.Column="1" Background="#1E3A8A" CornerRadius="10" Padding="8,2" VerticalAlignment="Center">
+                                    <TextBlock Text="LIBOPS" FontSize="9.5" FontWeight="Bold" Foreground="#93C5FD"/>
+                                </Border>
+                            </Grid>
+
+                            <!-- Hàng 2: [ Tên độc giả ] -->
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="left" Margin="0,6,0,12">
+                                <TextBlock Text="{Binding MemberCardSummary.FullName, FallbackValue='NGUYỄN VĂN A'}" 
+                                           FontSize="19" FontWeight="Bold" Foreground="#FFFFFF" 
+                                           HorizontalAlignment="left" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding MemberCardSummary.MemberCardCode, StringFormat='Mã thẻ: {0}', FallbackValue='Mã thẻ: DG0000'}" 
+                                           FontSize="12.5" FontWeight="SemiBold" Foreground="#94A3B8" 
+                                           HorizontalAlignment="left" Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <!-- Hàng 3: [ HSD: ..... ] (Trái) & [ Mã Vạch ] (Phải) -->
+                            <Grid Grid.Row="2" VerticalAlignment="Bottom">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Trái: Ngày cấp & Trạng thái -->
+                                <StackPanel Grid.Column="0" VerticalAlignment="Bottom">
+                                    <TextBlock Text="{Binding MemberCardSummary.IssueDate, StringFormat='Ngày cấp: {0:dd/MM/yyyy}', FallbackValue='Ngày cấp: --/--/----'}" 
+                                               FontSize="13" FontWeight="Bold" Foreground="#38BDF8"/>
+                                    <TextBlock Text="{Binding MemberCardSummary.CardStatusDisplay, FallbackValue='Đang hoạt động'}" 
+                                               FontSize="11" FontWeight="SemiBold" Foreground="#4ADE80" Margin="0,2,0,0"/>
+                                </StackPanel>
+
+                                <!-- Phải: Mã Vạch -->
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                                    <iconPacks:PackIconMaterial Kind="Barcode" Width="95" Height="28" Foreground="#FFFFFF" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- THẺ TÓM TẮT TÀI CHÍNH (SỐ DƯ CỌC & CÔNG NỢ) -->
+                    <Border Style="{StaticResource ModernCard}" Padding="14" Margin="0,0,0,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                <TextBlock Text="Số Dư Tiền Cọc" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding MemberCardSummary.DepositBalance, StringFormat={}{0:N0} đ, FallbackValue='0 đ'}" 
+                                           FontSize="17" FontWeight="Bold" Foreground="#10B981" Margin="0,2,0,0" HorizontalAlignment="Center"/>
+                            </StackPanel>
+
+                            <Rectangle Grid.Column="1" Fill="{StaticResource BorderLightBrush}" Margin="0,2"/>
+
+                            <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                <TextBlock Text="Nợ Phạt Hiện Tại" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding MemberCardSummary.TotalDebt, StringFormat={}{0:N0} đ, FallbackValue='0 đ'}" 
+                                           FontSize="17" FontWeight="Bold" Foreground="#EF4444" Margin="0,2,0,0" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- CÁC NÚT CHỨC NĂNG DƯỚI THẺ -->
+                    <Border Style="{StaticResource ModernCard}" Padding="16" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="THAO TÁC THẺ THƯ VIỆN" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+
+                            <!-- 1. Nút Gia Hạn Thẻ -->
+                            <Button Command="{Binding RenewCardCommand}" Style="{StaticResource PrimaryGradientButton}" Height="40" Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="Autorenew" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Gia Hạn Thẻ" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- 2. Nút Nạp Tiền Vào Thẻ -->
+                            <Button Command="{Binding ToggleTopUpCommand}" Style="{StaticResource SuccessButton}" Height="40" Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="CashPlus" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Nạp Tiền Vào Thẻ" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- 3. Nút Hủy Thẻ -->
+                            <Button Command="{Binding CloseCardCommand}" Style="{StaticResource DangerButton}" Height="40">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="CardRemoveOutline" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Hủy Thẻ" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- KHUNG NẠP TIỀN VIETQR TRỰC TUYẾN (HIỂN THỊ KHI BẤM NẠP TIỀN) -->
+                    <Border Visibility="{Binding IsTopUpPanelOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Style="{StaticResource ModernCard}" Background="#F8FAFC" Padding="16" Margin="0,0,0,16">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="QrcodeScan" Width="16" Height="16" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="NẠP TIỀN VIETQR TRỰC TUYẾN" FontWeight="Bold" FontSize="12.5" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Command="{Binding ToggleTopUpCommand}" Style="{StaticResource OutlineButton}" Width="26" Height="26" Padding="0">
+                                    <iconPacks:PackIconMaterial Kind="Close" Width="12" Height="12"/>
+                                </Button>
+                            </Grid>
+
+                            <TextBlock Text="Chọn nhanh mệnh giá hoặc nhập số tiền:" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+
+                            <!-- Quick Amount Buttons -->
+                            <UniformGrid Columns="4" Margin="0,0,0,10">
+                                <Button Content="50.000 đ" Command="{Binding SetQuickTopUpAmountCommand}" CommandParameter="50000" Style="{StaticResource OutlineButton}" Height="30" Margin="0,0,4,0" FontSize="11"/>
+                                <Button Content="100.000 đ" Command="{Binding SetQuickTopUpAmountCommand}" CommandParameter="100000" Style="{StaticResource OutlineButton}" Height="30" Margin="2,0,2,0" FontSize="11"/>
+                                <Button Content="200.000 đ" Command="{Binding SetQuickTopUpAmountCommand}" CommandParameter="200000" Style="{StaticResource OutlineButton}" Height="30" Margin="2,0,2,0" FontSize="11"/>
+                                <Button Content="500.000 đ" Command="{Binding SetQuickTopUpAmountCommand}" CommandParameter="500000" Style="{StaticResource OutlineButton}" Height="30" Margin="4,0,0,0" FontSize="11"/>
+                            </UniformGrid>
+
+                            <TextBlock Text="Số tiền nạp (VNĐ):" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4"/>
+                            <TextBox Style="{StaticResource ModernTextBox}" 
+                                     Text="{Binding TopUpAmountInput, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged}" 
+                                     Height="36" Margin="0,0,0,12"/>
+
+                            <Button Command="{Binding SimulateTopUpCommand}" Style="{StaticResource SuccessButton}" Height="38">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="CheckCircleOutline" Width="15" Height="15" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Xác Nhận Nạp Tiền (Mô Phỏng)" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- CỘT PHẢI: LỊCH SỬ BIÊN LAI TẤT CẢ DÒNG TIỀN (NẠP, PHẠT, GIA HẠN, HOÀN CỌC...) -->
+            <Border Grid.Column="1" Style="{StaticResource ModernCard}" Padding="18">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Title & Header Bar -->
+                    <Grid Grid.Row="0" Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="LỊCH SỬ BIÊN LAI &amp; BIẾN ĐỘNG DÒNG TIỀN" FontWeight="Bold" FontSize="15" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Tất cả các giao dịch: nộp cọc ban đầu, nạp thêm qua VietQR, khấu trừ nộp phạt, phí gia hạn, hoàn cọc..." 
+                                       FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <Border Grid.Column="1" Background="#F1F5F9" CornerRadius="6" Padding="10,5" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Tổng GD: " FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding CashFlowHistories.Count}" FontWeight="Bold" FontSize="12" Foreground="{StaticResource PrimaryBrush}"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Danh sách DataGrid các dòng tiền & Phân trang -->
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <DataGrid Grid.Row="0" 
+                                  Style="{StaticResource ModernDataGrid}" 
+                                  ItemsSource="{Binding CashFlowHistories}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  SelectionMode="Single"
+                                  CanUserSortColumns="True"
+                                  ScrollViewer.CanContentScroll="True"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <!-- Mã GD / Biên lai -->
+                                <DataGridTextColumn Header="Mã Giao Dịch" Binding="{Binding ReceiptCode}" FontWeight="Bold" Width="130" ElementStyle="{StaticResource CenterAlignedCell}"/>
+                                
+                                <!-- Thời gian -->
+                                <DataGridTextColumn Header="Thời Gian" Binding="{Binding FormattedTransactionDate}" Width="140" ElementStyle="{StaticResource CenterAlignedCell}"/>
+
+                                <!-- Loại giao dịch -->
+                                <DataGridTemplateColumn Header="Loại Giao Dịch" Width="160">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="4" Padding="8,3" HorizontalAlignment="Left"
+                                                    Background="{Binding IsInflow, Converter={StaticResource BoolToStatusBrushConverter}}">
+                                                <TextBlock Text="{Binding TransactionTypeDisplay}" FontSize="11.5" FontWeight="SemiBold" Foreground="White"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Số tiền biến động (+ / -) -->
+                                <DataGridTemplateColumn Header="Biến Động Số Tiền" Width="145">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding FormattedAmount}" FontWeight="Bold" FontSize="12.5"
+                                                       Foreground="{Binding AmountColorBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,8,0"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Số dư sau giao dịch -->
+                                <DataGridTextColumn Header="Số Dư Cọc Sau GD" Binding="{Binding FormattedBalanceAfter}" Width="130" ElementStyle="{StaticResource RightAlignedCell}"/>
+
+                                <!-- Người thực hiện -->
+                                <DataGridTextColumn Header="Thực Hiện Bởi" Binding="{Binding PerformedByStaffName}" Width="120"/>
+
+                                <!-- Chi tiết / Ghi chú -->
+                                <DataGridTextColumn Header="Nội Dung Chi Tiết" Binding="{Binding Notes}" Width="260"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <controls:PaginationControl Grid.Row="1" DataContext="{Binding Paging}" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+        </Grid>
+    </Grid>
+</UserControl>

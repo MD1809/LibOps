@@ -1,0 +1,309 @@
+﻿<UserControl x:Class="LibOps.PresentationLayer.Views.BookCopyBarcodeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LibOps.PresentationLayer.ViewModels"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:BookCopyBarcodeViewModel}"
+             FontFamily="Segoe UI">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- HÀNG 0: TIÊU ĐỀ & NÚT TẢI LẠI -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="QUẢN LÝ BẢN SAO SÁCH VÀ MÃ VẠCH" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock Text="Quản lý từng ấn bản vật lý lưu kho, sinh mã vạch Code128, cập nhật tình trạng và in tem nhãn" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+            </StackPanel>
+
+            <Button Style="{StaticResource OutlineButton}" HorizontalAlignment="Right" VerticalAlignment="Center" Height="36" Padding="14,0" Command="{Binding RefreshCommand}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="Refresh" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <TextBlock Text="Tải Lại" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- HÀNG 1: 4 THẺ THỐNG KÊ KPI ĐẦU SÁCH -->
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource ModernCard}" Padding="12,10">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="BookMultiple" Width="13" Height="13" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="TỔNG BẢN SAO" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding TotalCopiesCount}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource ModernCard}" Padding="12,10">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="CheckCircleOutline" Width="13" Height="13" Foreground="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="SẴN SÀNG MƯỢN" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding AvailableCopiesCount}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="4" Style="{StaticResource ModernCard}" Padding="12,10">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="BookArrowRight" Width="13" Height="13" Foreground="{StaticResource PrimaryLightBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="ĐANG CHO MƯỢN" FontSize="11" FontWeight="Bold" Foreground="{StaticResource PrimaryLightBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding BorrowedCopiesCount}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryLightBrush}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="6" Style="{StaticResource ModernCard}" Padding="12,10">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="AlertCircleOutline" Width="13" Height="13" Foreground="{StaticResource ErrorBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="HƯ HỎNG / MẤT" FontSize="11" FontWeight="Bold" Foreground="{StaticResource ErrorBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding DamagedOrLostCount}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource ErrorBrush}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- HÀNG 2: 2 KHUNG THAO TÁC (SINH MỚI & CẬP NHẬT TRẠNG THÁI) -->
+        <Grid Grid.Row="2" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="420" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Khung 1: Sinh Bản Sao Tự Động -->
+            <Border Grid.Column="0" Style="{StaticResource ModernCard}" Padding="16">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <iconPacks:PackIconMaterial Kind="PlusCircleOutline" Width="15" Height="15" Foreground="{StaticResource PrimaryGradientBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="SINH BẢN SAO VÀ MÃ VẠCH TỰ ĐỘNG" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Số lượng (*)" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding AddCopyCount, UpdateSourceTrigger=PropertyChanged}" Height="34" Style="{StaticResource ModernTextBox}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Tình trạng ban đầu" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding InitialCondition, UpdateSourceTrigger=PropertyChanged}" Height="34" Style="{StaticResource ModernTextBox}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Button Style="{StaticResource PrimaryGradientButton}"
+                            Height="36"
+                            Command="{Binding GenerateCopiesCommand}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="PlusBoxOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="Sinh Bản Sao Và Tạo Barcode" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Khung 2: Cập Nhật Bản Sao Đang Chọn & In Tem Barcode -->
+            <Border Grid.Column="2" Style="{StaticResource ModernCard}" Padding="16">
+                <StackPanel>
+                    <Grid Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="CẬP NHẬT TÌNH TRẠNG BẢN SAO ĐANG CHỌN" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding SelectedCopyBarcode}" HorizontalAlignment="Right" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Trạng thái -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Trạng thái lưu thông" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                            <ComboBox SelectedValue="{Binding SelectedCopyStatus, Mode=TwoWay}"
+                                      SelectedValuePath="Tag"
+                                      Height="34" Style="{StaticResource ModernComboBox}">
+                                <ComboBoxItem Tag="AVAILABLE">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="CheckCircle" Width="12" Height="12" Foreground="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                        <TextBlock Text="Sẵn sàng mượn" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ComboBoxItem>
+                                <ComboBoxItem Tag="BORROWED">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="BookArrowRight" Width="12" Height="12" Foreground="{StaticResource PrimaryLightBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                        <TextBlock Text="Đang cho mượn" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ComboBoxItem>
+                                <ComboBoxItem Tag="DAMAGED">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="AlertOutline" Width="12" Height="12" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                        <TextBlock Text="Hư hỏng nhẹ" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ComboBoxItem>
+                                <ComboBoxItem Tag="LOST">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="CloseCircle" Width="12" Height="12" Foreground="{StaticResource ErrorBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                        <TextBlock Text="Báo mất sách" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Ghi chú tình trạng -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Ghi chú chi tiết tình trạng" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding SelectedCopyConditionNote, UpdateSourceTrigger=PropertyChanged}" Height="34" Style="{StaticResource ModernTextBox}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource OutlineButton}" Height="34" Padding="14,0" Margin="0,0,8,0" Command="{Binding PrintBarcodeCommand}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="Printer" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="In Tem Barcode" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource DangerButton}" Height="34" Padding="14,0" Margin="0,0,8,0" Command="{Binding DeleteCopyCommand}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="TrashCanOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="Xóa Bản Sao" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SuccessButton}" Height="34" Padding="16,0" Command="{Binding UpdateCopyCommand}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="ContentSaveOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="Lưu Cập Nhật" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- HÀNG 3: BẢNG DANH SÁCH BẢN SAO -->
+        <Border Grid.Row="3" Style="{StaticResource ModernCard}" Padding="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                    <iconPacks:PackIconMaterial Kind="ClipboardListOutline" Width="15" Height="15" Foreground="{StaticResource PrimaryGradientBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <TextBlock Text="DANH SÁCH TẤT CẢ BẢN SAO CỦA ĐẦU SÁCH" FontSize="13.5" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- DataGrid Bản sao -->
+                <DataGrid Grid.Row="1"
+                          ItemsSource="{Binding Copies}"
+                          SelectedItem="{Binding SelectedCopy, Mode=TwoWay}"
+                          Style="{StaticResource ModernDataGrid}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Mã Bản Sao" Binding="{Binding CopyCode}" Width="120">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Mã Vạch Barcode" Binding="{Binding Barcode}" Width="160" FontWeight="Bold">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTemplateColumn Header="Trạng Thái" Width="160">
+                            <DataGridTemplateColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTemplateColumn.HeaderStyle>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding StatusDisplay}" FontWeight="Bold" Foreground="{Binding StatusColorBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn Header="Tình Trạng Chi Tiết" Binding="{Binding ConditionNote}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Left" />
+                                    <Setter Property="Padding" Value="10,0,0,0" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Ngày Nhập Kho" Binding="{Binding CreatedAt, StringFormat=dd/MM/yyyy}" Width="130">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- HÀNG 4: FOOTER THÔNG BÁO TRẠNG THÁI -->
+        <Border Grid.Row="4" Margin="0,10,0,0">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="10" FontWeight="SemiBold"
+                       Foreground="{Binding StatusMessageBrush}" />
+        </Border>
+    </Grid>
+</UserControl>

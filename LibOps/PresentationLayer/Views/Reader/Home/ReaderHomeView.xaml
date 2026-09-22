@@ -1,0 +1,233 @@
+<UserControl x:Class="LibOps.PresentationLayer.Views.ReaderHomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:LibOps.PresentationLayer.ViewModels"
+             xmlns:conv="clr-namespace:LibOps.PresentationLayer.Converters"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:ReaderHomeViewModel}"
+             FontFamily="Segoe UI">
+
+    <UserControl.Resources>
+        <conv:BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConverter" />
+
+        <!-- Card Button Style for Trending & New Books -->
+        <Style x:Key="DiscoveryBookCardStyle" TargetType="Button">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="CardBorder" 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="10" 
+                                Effect="{StaticResource CardShadow}">
+                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CardBorder" Property="BorderBrush" Value="{StaticResource BrandIndigoBrush}" />
+                                <Setter TargetName="CardBorder" Property="Effect" Value="{StaticResource FloatingShadow}" />
+                                <Setter Property="Background" Value="#FDFDFE" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="CardBorder" Property="BorderBrush" Value="{StaticResource BrandPinkBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,0,0,20">
+        <StackPanel>
+
+            <!-- 1. HERO BANNER  -->
+            <Border CornerRadius="12" Margin="0,0,0,22" Padding="28,24" Effect="{StaticResource FloatingShadow}">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#0F172A" Offset="0.0"/>
+                        <GradientStop Color="#1E1B4B" Offset="0.5"/>
+                        <GradientStop Color="#312E81" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <!-- Tiêu đề & Slogan -->
+                <StackPanel VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <TextBlock Text="CỔNG KHÁM PHÁ TRI THỨC VÀ TÀI LIỆU SỐ" FontSize="12" FontWeight="Bold" Foreground="{StaticResource BrandPinkBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Học tập không giới hạn, vươn tầm tri thức" FontSize="22" FontWeight="ExtraBold" Foreground="#FFFFFF"/>
+                    <TextBlock Text="Khám phá các tựa sách nổi bật được mượn nhiều nhất và những ấn phẩm mới nhất vừa nhập kho tại thư viện LibOps." 
+                               FontSize="13" Foreground="#94A3B8" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 2. KHỐI 1: TOP SÁCH ĐƯỢC MƯỢN NHIỀU NHẤT -->
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="Fire" Width="20" Height="20" Foreground="{StaticResource BrandPinkBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="SÁCH NỔI BẬT VÀ MƯỢN NHIỀU NHẤT" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Lưới sách Trending -->
+            <ItemsControl ItemsSource="{Binding TrendingBooks}" Margin="0,0,0,24" HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Style="{StaticResource DiscoveryBookCardStyle}" 
+                                Width="210" Margin="8,0,8,24"
+                                Command="{Binding DataContext.ViewBookDetailCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="320"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Ảnh bìa -->
+                                <Border Grid.Row="0" CornerRadius="10,10,0,0" Background="#F1F5F9">
+                                    <Grid>
+                                        <Border CornerRadius="10,10,0,0" Height="320" Visibility="{Binding HasCoverImage, Converter={StaticResource BoolToVisConverter}}">
+                                            <Border.Background>
+                                                <ImageBrush ImageSource="{Binding CoverImagePath, Converter={StaticResource CoverImageConverter}}" Stretch="UniformToFill"/>
+                                            </Border.Background>
+                                        </Border>
+                                        <Border CornerRadius="10,10,0,0" Background="#F8FAFC" Visibility="{Binding HasCoverImage, Converter={StaticResource InverseBoolToVisConverter}}">
+                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <TextBlock Text="LibOps" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource SlateMutedBrush}" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Badge Số lượt mượn -->
+                                        <Border HorizontalAlignment="Right" VerticalAlignment="Top" 
+                                                Margin="6" Padding="6,3" CornerRadius="5" Background="#FEE2E2">
+                                            <TextBlock Text="{Binding BorrowCount, StringFormat='{}{0} lượt'}" FontSize="10.5" FontWeight="Bold" Foreground="#DC2626"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Thông tin chi tiết -->
+                                <StackPanel Grid.Row="1" Margin="10,8">
+                                    <TextBlock Text="{Binding Title}" FontSize="12.5" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" 
+                                               MaxHeight="34" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" LineHeight="16"/>
+                                    <TextBlock Text="{Binding AuthorName}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" 
+                                               TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding CategoryName}" FontSize="11" Foreground="{StaticResource BrandIndigoBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="1" Text="Có sẵn" FontSize="11" FontWeight="Bold" Foreground="#059669"
+                                                   Visibility="{Binding IsAvailable, Converter={StaticResource BoolToVisConverter}}"/>
+                                        <TextBlock Grid.Column="1" Text="Đã mượn" FontSize="11" FontWeight="Bold" Foreground="#D97706"
+                                                   Visibility="{Binding IsAvailable, Converter={StaticResource InverseBoolToVisConverter}}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- 3. KHỐI 2: SÁCH MỚI NHẬP THƯ VIỆN -->
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="StarOutline" Width="20" Height="20" Foreground="{StaticResource BrandPinkBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="SÁCH MỚI VỀ THƯ VIỆN" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Lưới sách Mới -->
+            <ItemsControl ItemsSource="{Binding NewArrivals}" Margin="0,0,0,24" HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Style="{StaticResource DiscoveryBookCardStyle}" 
+                                Width="210" Margin="8,0,8,16"
+                                Command="{Binding DataContext.ViewBookDetailCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="320"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Ảnh bìa -->
+                                <Border Grid.Row="0" CornerRadius="10,10,0,0" Background="#F1F5F9">
+                                    <Grid>
+                                        <Border CornerRadius="10,10,0,0" Height="320" Visibility="{Binding HasCoverImage, Converter={StaticResource BoolToVisConverter}}">
+                                            <Border.Background>
+                                                <ImageBrush ImageSource="{Binding CoverImagePath, Converter={StaticResource CoverImageConverter}}" Stretch="UniformToFill"/>
+                                            </Border.Background>
+                                        </Border>
+                                        <Border CornerRadius="10,10,0,0" Background="#F8FAFC" Visibility="{Binding HasCoverImage, Converter={StaticResource InverseBoolToVisConverter}}">
+                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <iconPacks:PackIconMaterial Kind="BookOpenPageVariantOutline" Width="36" Height="36" Foreground="{StaticResource SlateMutedBrush}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                                <TextBlock Text="LibOps" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource SlateMutedBrush}" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+                                        
+                                        <!-- Badge NEW -->
+                                        <Border HorizontalAlignment="Left" VerticalAlignment="Top" 
+                                                Margin="6" Padding="7,3" CornerRadius="5" Background="#059669">
+                                            <TextBlock Text="MỚI" FontSize="10" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Thông tin chi tiết -->
+                                <StackPanel Grid.Row="1" Margin="10,8">
+                                    <TextBlock Text="{Binding Title}" FontSize="12.5" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" 
+                                               MaxHeight="34" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" LineHeight="16"/>
+                                    <TextBlock Text="{Binding AuthorName}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" 
+                                               TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding CategoryName}" FontSize="11" Foreground="{StaticResource BrandIndigoBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="1" Text="Có sẵn" FontSize="11" FontWeight="Bold" Foreground="#059669"
+                                                   Visibility="{Binding IsAvailable, Converter={StaticResource BoolToVisConverter}}"/>
+                                        <TextBlock Grid.Column="1" Text="Đã mượn" FontSize="11" FontWeight="Bold" Foreground="#D97706"
+                                                   Visibility="{Binding IsAvailable, Converter={StaticResource InverseBoolToVisConverter}}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

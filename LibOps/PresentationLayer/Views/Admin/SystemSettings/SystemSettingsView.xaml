@@ -1,0 +1,588 @@
+<UserControl x:Class="LibOps.PresentationLayer.Views.SystemSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:LibOps.PresentationLayer.ViewModels"
+             xmlns:conv="clr-namespace:LibOps.PresentationLayer.Converters"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:SystemSettingsViewModel}"
+             d:DesignHeight="950" d:DesignWidth="1100">
+
+    <UserControl.Resources>
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+
+        <!-- Style cho Setting Group Card -->
+        <Style x:Key="SettingGroupCard" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="18,16"/>
+            <Setter Property="Margin" Value="0,0,0,18"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="8" Direction="270" ShadowDepth="2" Opacity="0.04" Color="#0F172A"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style cho Setting Label -->
+        <Style x:Key="SettingFieldLabel" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Foreground" Value="#334155"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+
+        <!-- Style cho TextBox Setting (phản hồi theo IsReadOnly) -->
+        <Style x:Key="SettingInputTextBox" TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="IsReadOnly" Value="True">
+                    <Setter Property="Background" Value="#F8FAFC"/>
+                    <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                    <Setter Property="Foreground" Value="#475569"/>
+                    <Setter Property="Cursor" Value="Arrow"/>
+                    <Setter Property="Focusable" Value="False"/>
+                </Trigger>
+                <Trigger Property="IsReadOnly" Value="False">
+                    <Setter Property="Background" Value="#FFFFFF"/>
+                    <Setter Property="BorderBrush" Value="#3B82F6"/>
+                    <Setter Property="BorderThickness" Value="1.5"/>
+                    <Setter Property="Foreground" Value="#0F172A"/>
+                    <Setter Property="Cursor" Value="IBeam"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style Nút Icon Bút (Chỉnh Sửa) -->
+        <Style x:Key="PencilEditButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#F1F5F9"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="ToolTip" Value="Nhấn để chỉnh sửa nhóm này"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#E0E7FF"/>
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="#6366F1"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#C7D2FE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style Nút Hủy (Group Header) -->
+        <Style x:Key="GroupCancelButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="12,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="ToolTip" Value="Hủy bỏ và hoàn tác các thay đổi"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#FEE2E2"/>
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="#FCA5A5"/>
+                                <Setter Property="Foreground" Value="#DC2626"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style Nút Lưu (Group Header) -->
+        <Style x:Key="GroupSaveButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="14,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryGradientBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="ToolTip" Value="Lưu thay đổi của nhóm này"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Trang Cấu Hình -->
+        <Border Grid.Row="0" Style="{StaticResource ModernCard}" Margin="0,0,0,16" Padding="18,14">
+            <StackPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="CẤU HÌNH QUY ĐỊNH VÀ THAM SỐ TOÀN HỆ THỐNG" FontSize="17" FontWeight="Bold" Foreground="{StaticResource SlateDarkBrush}"/>
+                </StackPanel>
+                <TextBlock Text="Cài đặt hạn mức mượn, tiền cọc mở thẻ, đơn giá phạt trễ hạn và máy chủ gửi email thông báo tự động" FontSize="12" Foreground="{StaticResource SlateMutedBrush}" Margin="0,2,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Form Scroll Container chứa 4 Nhóm Cấu Hình -->
+        <Border Grid.Row="1" Style="{StaticResource ModernCard}" Padding="16,14">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="0,4,8,8">
+                    
+                    <!-- ======================================================== -->
+                    <!-- NHÓM 1: QUY ĐỊNH THẺ ĐỘC GIẢ & PHÍ DỊCH VỤ -->
+                    <!-- ======================================================== -->
+                    <Border Style="{StaticResource SettingGroupCard}">
+                        <StackPanel>
+                            <!-- Header Hàng Tiêu Đề Nhóm + Nút Bút / Hủy & Lưu -->
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Tiêu đề nhóm -->
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="QUY ĐỊNH THẺ ĐỘC GIẢ VÀ PHÍ DỊCH VỤ" FontWeight="Bold" FontSize="14" Foreground="{StaticResource SlateDarkBrush}"/>
+                                    <TextBlock Text="Cài đặt mức tiền ký quỹ thế chân, phí phát hành thẻ ban đầu và thời hạn sử dụng" FontSize="11.5" Foreground="#64748B"/>
+                                </StackPanel>
+
+                                <!-- Vùng Nút Thao Tác Bên Phải Header -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Nút Bút (Hiện khi chưa sửa) -->
+                                    <Button Command="{Binding EditMembershipRulesCommand}" 
+                                            Style="{StaticResource PencilEditButtonStyle}"
+                                            Visibility="{Binding IsEditingMembershipRules, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                        <iconPacks:PackIconMaterial Kind="PencilOutline" Width="14" Height="14" Foreground="#2563EB"/>
+                                    </Button>
+
+                                    <!-- Cặp nút Hủy & Lưu (Hiện khi đang sửa) -->
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsEditingMembershipRules, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Button Command="{Binding CancelMembershipRulesCommand}" 
+                                                Style="{StaticResource GroupCancelButtonStyle}" 
+                                                Margin="0,0,8,0">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="Hủy" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button Command="{Binding SaveMembershipRulesCommand}" 
+                                                Style="{StaticResource GroupSaveButtonStyle}">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <iconPacks:PackIconMaterial Kind="ContentSaveOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                <TextBlock Text="Lưu" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Các ô dữ liệu Nhóm 1 (3 Cột) -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Field 1: Mức ký quỹ -->
+                                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Mức tiền ký quỹ mở thẻ (VNĐ):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingMembershipRules, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding DefaultDeposit, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Tiền ký quỹ thế chân độc giả nộp khi đăng ký thẻ (được hoàn lại khi hủy thẻ)"/>
+                                </StackPanel>
+
+                                <!-- Field 2: Phí phát hành thẻ -->
+                                <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Phí phát hành thẻ mới (VNĐ):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingMembershipRules, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding CardIssuanceFee, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Phí in phôi thẻ / dịch vụ phát hành không hoàn lại (Doanh thu thư viện)"/>
+                                </StackPanel>
+
+                                <!-- Field 3: Thời hạn thẻ -->
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Thời hạn sử dụng thẻ (Ngày):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingMembershipRules, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding ValidityDays, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Thời gian hiệu lực thẻ kể từ ngày cấp (Ví dụ: 365 ngày = 1 năm)"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ======================================================== -->
+                    <!-- NHÓM 2: QUY ĐỊNH MƯỢN TRẢ & GIA HẠN SÁCH -->
+                    <!-- ======================================================== -->
+                    <Border Style="{StaticResource SettingGroupCard}">
+                        <StackPanel>
+                            <!-- Header Hàng Tiêu Đề Nhóm + Nút Bút / Hủy & Lưu -->
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Tiêu đề nhóm -->
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="QUY ĐỊNH MƯỢN TRẢ VÀ GIA HẠN SÁCH" FontWeight="Bold" FontSize="14" Foreground="{StaticResource SlateDarkBrush}"/>
+                                    <TextBlock Text="Cài đặt hạn mức số sách mượn cùng lúc, số ngày mượn tiêu chuẩn và chính sách gia hạn" FontSize="11.5" Foreground="#64748B"/>
+                                </StackPanel>
+
+                                <!-- Vùng Nút Thao Tác Bên Phải Header -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Nút Bút (Hiện khi chưa sửa) -->
+                                    <Button Command="{Binding EditBorrowRulesCommand}" 
+                                            Style="{StaticResource PencilEditButtonStyle}"
+                                            Visibility="{Binding IsEditingBorrowRules, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                        <iconPacks:PackIconMaterial Kind="PencilOutline" Width="14" Height="14" Foreground="#2563EB"/>
+                                    </Button>
+
+                                    <!-- Cặp nút Hủy & Lưu (Hiện khi đang sửa) -->
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsEditingBorrowRules, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Button Command="{Binding CancelBorrowRulesCommand}" 
+                                                Style="{StaticResource GroupCancelButtonStyle}" 
+                                                Margin="0,0,8,0">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="Hủy" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button Command="{Binding SaveBorrowRulesCommand}" 
+                                                Style="{StaticResource GroupSaveButtonStyle}">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <iconPacks:PackIconMaterial Kind="ContentSaveOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                <TextBlock Text="Lưu" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Các ô dữ liệu Nhóm 2 (2 Hàng x 2 Cột) -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Hàng 1: Max Days & Max Books -->
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,14,14">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Số ngày mượn sách tối đa mỗi lần (Ngày):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingBorrowRules, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding MaxBorrowDays, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Thời hạn tối đa độc giả được giữ sách mỗi lượt mượn (Ví dụ: 14 ngày)"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,14">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Hạn mức số sách mượn cùng lúc (Cuốn):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingBorrowRules, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding MaxBooksPerMember, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Số lượng cuốn sách tối đa một độc giả được phép mượn đồng thời (Ví dụ: 3 cuốn)"/>
+                                </StackPanel>
+
+                                <!-- Hàng 2: Max Renewal Count & Renewal Days -->
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Số lần tối đa được phép gia hạn sách (Lần):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingBorrowRules, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding MaxRenewalCount, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Số lần độc giả có thể tự gia hạn sách trước khi đến hạn trả (Ví dụ: 1 lần)"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="1">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Số ngày cộng thêm mỗi lần gia hạn (Ngày):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingBorrowRules, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding RenewalDays, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Số ngày hạn trả được kéo dài thêm cho mỗi lần gia hạn thành công (Ví dụ: 7 ngày)"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ======================================================== -->
+                    <!-- NHÓM 3: CHẾ TÀI PHẠT QUÁ HẠN & BỒI THƯỜNG -->
+                    <!-- ======================================================== -->
+                    <Border Style="{StaticResource SettingGroupCard}">
+                        <StackPanel>
+                            <!-- Header Hàng Tiêu Đề Nhóm + Nút Bút / Hủy & Lưu -->
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Tiêu đề nhóm -->
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="CẤU HÌNH PHẠT VÀ BỒI THƯỜNG" FontWeight="Bold" FontSize="14" Foreground="{StaticResource SlateDarkBrush}"/>
+                                    <TextBlock Text="Cài đặt mức tính tiền phạt trả trễ mỗi ngày và tỷ lệ phần trăm bồi thường giá sách khi rủi ro" FontSize="11.5" Foreground="#64748B"/>
+                                </StackPanel>
+
+                                <!-- Vùng Nút Thao Tác Bên Phải Header -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Nút Bút (Hiện khi chưa sửa) -->
+                                    <Button Command="{Binding EditPenaltyRulesCommand}" 
+                                            Style="{StaticResource PencilEditButtonStyle}"
+                                            Visibility="{Binding IsEditingPenaltyRules, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                        <iconPacks:PackIconMaterial Kind="PencilOutline" Width="14" Height="14" Foreground="#2563EB"/>
+                                    </Button>
+
+                                    <!-- Cặp nút Hủy & Lưu (Hiện khi đang sửa) -->
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsEditingPenaltyRules, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Button Command="{Binding CancelPenaltyRulesCommand}" 
+                                                Style="{StaticResource GroupCancelButtonStyle}" 
+                                                Margin="0,0,8,0">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="Hủy" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button Command="{Binding SavePenaltyRulesCommand}" 
+                                                Style="{StaticResource GroupSaveButtonStyle}">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <iconPacks:PackIconMaterial Kind="ContentSaveOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                <TextBlock Text="Lưu" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Các ô dữ liệu Nhóm 3 (3 Cột) -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Field 1: Đơn giá phạt quá hạn -->
+                                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Phạt trễ hạn (VNĐ / Ngày / Cuốn):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingPenaltyRules, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding FinePerOverdueDay, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Mức tiền phạt tự động nhân theo mỗi ngày trễ hạn của từng cuốn sách"/>
+                                </StackPanel>
+
+                                <!-- Field 2: Tỷ lệ hư hại -->
+                                <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Bồi thường hư hại sách (% giá bìa):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingPenaltyRules, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding DamagedRatePercent, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Tỷ lệ phần trăm bồi thường giá bìa khi sách bị rách, gãy gáy hoặc hư hỏng (Ví dụ: 50%)"/>
+                                </StackPanel>
+
+                                <!-- Field 3: Tỷ lệ làm mất sách -->
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Bồi thường làm mất sách (% giá bìa):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingPenaltyRules, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding LostRatePercent, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Tỷ lệ phần trăm bồi thường giá bìa khi độc giả làm mất sách (Ví dụ: 200%)"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ======================================================== -->
+                    <!-- NHÓM 4: CẤU HÌNH MÁY CHỦ EMAIL THÔNG BÁO (SMTP) -->
+                    <!-- ======================================================== -->
+                    <Border Style="{StaticResource SettingGroupCard}">
+                        <StackPanel>
+                            <!-- Header Hàng Tiêu Đề Nhóm + Nút Bút / Hủy & Lưu -->
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Tiêu đề nhóm -->
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="CẤU HÌNH MÁY CHỦ GỬI EMAIL THÔNG BÁO (SMTP)" FontWeight="Bold" FontSize="14" Foreground="{StaticResource SlateDarkBrush}"/>
+                                    <TextBlock Text="Kết nối máy chủ Gmail / Microsoft 365 để tự động gửi thông báo mượn trả, nhắc hạn và biên lai" FontSize="11.5" Foreground="#64748B"/>
+                                </StackPanel>
+
+                                <!-- Vùng Nút Thao Tác Bên Phải Header -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Nút Bút (Hiện khi chưa sửa) -->
+                                    <Button Command="{Binding EditSmtpSettingsCommand}" 
+                                            Style="{StaticResource PencilEditButtonStyle}"
+                                            Visibility="{Binding IsEditingSmtpSettings, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                        <iconPacks:PackIconMaterial Kind="PencilOutline" Width="14" Height="14" Foreground="#2563EB"/>
+                                    </Button>
+
+                                    <!-- Cặp nút Hủy & Lưu (Hiện khi đang sửa) -->
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsEditingSmtpSettings, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Button Command="{Binding CancelSmtpSettingsCommand}" 
+                                                Style="{StaticResource GroupCancelButtonStyle}" 
+                                                Margin="0,0,8,0">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="Hủy" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button Command="{Binding SaveSmtpSettingsCommand}" 
+                                                Style="{StaticResource GroupSaveButtonStyle}">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <iconPacks:PackIconMaterial Kind="ContentSaveOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                <TextBlock Text="Lưu" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- HÀNG CÔNG TẮC TOGGLE SWITCH -->
+                            <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,16">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Switch 1: Bật/Tắt Gửi Email Tự Động -->
+                                    <CheckBox Grid.Column="0" 
+                                              Style="{StaticResource ModernSuccessToggleSwitch}" 
+                                              IsChecked="{Binding SystemEmailNotificationEnabled, Mode=TwoWay}" 
+                                              IsEnabled="{Binding IsEditingSmtpSettings}"
+                                              VerticalAlignment="Center">
+                                        <StackPanel Margin="4,0,0,0">
+                                            <TextBlock Text="Bật gửi thông báo qua Email" FontWeight="Bold" FontSize="13" Foreground="#1E293B"/>
+                                            <TextBlock Text="Tự động gửi email khi cấp thẻ, thu phí, mượn trả sách, nhắc quá hạn..." FontSize="11" Foreground="#64748B"/>
+                                        </StackPanel>
+                                    </CheckBox>
+
+                                    <!-- Switch 2: Bật/Tắt Mã Hóa SSL/TLS -->
+                                    <CheckBox Grid.Column="1" 
+                                              Style="{StaticResource ModernToggleSwitch}" 
+                                              IsChecked="{Binding SmtpEnableSsl, Mode=TwoWay}" 
+                                              IsEnabled="{Binding IsEditingSmtpSettings}"
+                                              VerticalAlignment="Center">
+                                        <StackPanel Margin="4,0,0,0">
+                                            <TextBlock Text="Bật mã hóa bảo mật SSL / TLS" FontWeight="Bold" FontSize="13" Foreground="#1E293B"/>
+                                            <TextBlock Text="Bảo mật đường truyền kết nối máy chủ thư (khuyến nghị luôn bật)" FontSize="11" Foreground="#64748B"/>
+                                        </StackPanel>
+                                    </CheckBox>
+                                </Grid>
+                            </Border>
+
+                            <!-- CÁC Ô NHẬP LIỆU THÔNG SỐ SMTP -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Row 0: SMTP Host & Port -->
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,14,14">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Địa chỉ Máy chủ SMTP (Host):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingSmtpSettings, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding SmtpHost, UpdateSourceTrigger=PropertyChanged}" 
+                                             ToolTip="Ví dụ: smtp.gmail.com hoặc smtp.office365.com"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,14">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Cổng kết nối (Port):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingSmtpSettings, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding SmtpPort, UpdateSourceTrigger=PropertyChanged}" 
+                                             ToolTip="587 (TLS/STARTTLS) hoặc 465 (SSL) hoặc 25"/>
+                                </StackPanel>
+
+                                <!-- Row 1: Username & Password -->
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,14,14">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Tài khoản Email gửi (Username / Email):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingSmtpSettings, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding SmtpUsername, UpdateSourceTrigger=PropertyChanged}" 
+                                             ToolTip="Địa chỉ email dùng để gửi tin (ví dụ: notification.libops@gmail.com)"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,14">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Mật khẩu ứng dụng (App Password 16 chữ số):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingSmtpSettings, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding SmtpPassword, UpdateSourceTrigger=PropertyChanged}" 
+                                             ToolTip="Mật khẩu ứng dụng (App Password) do Google/Microsoft sinh ra để xác thực an toàn"/>
+                                </StackPanel>
+
+                                <!-- Row 2: From Name & Note -->
+                                <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource SettingFieldLabel}" Text="Tên người gửi hiển thị (From Name):"/>
+                                    <TextBox Style="{StaticResource SettingInputTextBox}" 
+                                             IsReadOnly="{Binding IsEditingSmtpSettings, Converter={StaticResource InverseBooleanConverter}}"
+                                             Text="{Binding SmtpFromName, UpdateSourceTrigger=PropertyChanged}" 
+                                             ToolTip="Ví dụ: LibOps - Thư Viện Hiện Đại"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,163 @@
+<UserControl x:Class="LibOps.PresentationLayer.Views.ReturnBookProcessView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             FontFamily="Segoe UI">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="TRẢ SÁCH VÀ XỬ LÝ VI PHẠM" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock Text="Trả sách nhanh chóng, xử lý phạt rõ ràng." FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Quét mã vạch trả sách -->
+        <Border Grid.Row="1" Style="{StaticResource ModernCard}" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="260" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Quét mã vạch sách trả: " FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <TextBox Grid.Column="1" Text="{Binding ReturnBarcode, UpdateSourceTrigger=PropertyChanged}" Height="36" />
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="8,0,0,0">
+                    <Button Style="{StaticResource SuccessButton}" Height="36" Command="{Binding AddBarcodeCommand}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="Plus" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="Thêm Vào Giỏ" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource PrimaryGradientButton}" Height="36" Margin="8,0,0,0" Command="{Binding SearchByMemberCommand}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="AccountSearchOutline" Width="15" Height="15" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="Tìm Theo Độc Giả / Báo Mất" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <Button Grid.Column="3" Style="{StaticResource OutlineButton}" HorizontalAlignment="Right" Height="36" Command="{Binding ClearCartCommand}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="TrashCanOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Làm Trống Giỏ" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Lưới giỏ trả sách -->
+        <Border Grid.Row="2" Style="{StaticResource ModernCard}" Padding="0">
+            <DataGrid ItemsSource="{Binding ReturnCart}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Mã Vạch" Binding="{Binding Barcode}" Width="120" />
+                    <DataGridTextColumn Header="Tên Sách" Binding="{Binding BookTitle}" Width="*" />
+                    <DataGridTextColumn Header="Độc Giả" Binding="{Binding MemberFullName}" Width="160" />
+                    <DataGridTextColumn Header="Hạn Trả" Binding="{Binding DueDate, StringFormat=dd/MM/yyyy}" Width="100" />
+                    <DataGridTextColumn Header="Quá Hạn" Binding="{Binding OverdueDaysDisplay}" Width="90" />
+                    <DataGridTextColumn Header="Phạt Trễ" Binding="{Binding OverdueFine, StringFormat={}{0:N0} đ}" Width="100" />
+                    <DataGridTemplateColumn Header="Tình Trạng Sách" Width="195">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox SelectedValue="{Binding ConditionDisplay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedValuePath="Tag" Height="30" VerticalContentAlignment="Center">
+                                    <ComboBoxItem Content="Nguyên vẹn (0 đ)" Tag="Nguyên vẹn (0 đ)" />
+                                    <ComboBoxItem Content="Hư hỏng nhẹ (50%)" Tag="Hư hỏng nhẹ (50%)" />
+                                    <ComboBoxItem Content="Làm mất sách (200%)" Tag="Làm mất sách (200%)" />
+                                </ComboBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Phạt Hỏng/Mất" Binding="{Binding ConditionFine, StringFormat={}{0:N0} đ}" Width="110" />
+                    <DataGridTextColumn Header="Tổng Phạt" Binding="{Binding TotalFine, StringFormat={}{0:N0} đ}" Width="110" />
+                    <DataGridTemplateColumn Header="Thao Tác" Width="80">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource DangerButton}" Height="28" Padding="6,0"
+                                        Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <iconPacks:PackIconMaterial Kind="TrashCanOutline" Width="12" Height="12" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                        <TextBlock Text="Xóa" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- Tóm tắt số tiền phạt & 3 Option thanh toán -->
+        <Border Grid.Row="3" Style="{StaticResource ModernCard}" Margin="0,16,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Dòng tổng hợp -->
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Giỏ trả: " Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding ReturnCart.Count}" FontWeight="Bold" />
+                        <TextBlock Text=" cuốn sách | Phạt quá hạn: " Foreground="{StaticResource TextSecondaryBrush}" Margin="8,0,0,0" />
+                        <TextBlock Text="{Binding TotalOverdueFine, StringFormat={}{0:N0} đ}" FontWeight="Bold" />
+                        <TextBlock Text=" | Phạt hỏng/mất: " Foreground="{StaticResource TextSecondaryBrush}" Margin="8,0,0,0" />
+                        <TextBlock Text="{Binding TotalConditionFine, StringFormat={}{0:N0} đ}" FontWeight="Bold" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="==> TỔNG TIỀN PHẠT: " FontWeight="Bold" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="{Binding GrandTotalFine, StringFormat={}{0:N0} VNĐ}" FontWeight="Bold" FontSize="12" Foreground="{StaticResource ErrorBrush}" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- 3 Option RadioButtons -->
+                <StackPanel Grid.Row="1">
+                    <TextBlock Text="HÌNH THỨC THANH TOÁN TIỀN PHẠT:" FontWeight="Bold" Margin="0,0,0,8" />
+
+                    <RadioButton Content="1. Trả trực tiếp (Tiền mặt / Chuyển khoản QR tại quầy) -> Giữ nguyên tiền trong thẻ"
+                                 IsChecked="{Binding IsCashSelected}"
+                                 Margin="0,0,0,6" />
+
+                    <RadioButton Content="2. Khấu trừ vào tiền trong thẻ"
+                                 IsChecked="{Binding IsDepositSelected}"
+                                 IsEnabled="{Binding CanDeductDeposit}"
+                                 Margin="0,0,0,6" />
+
+                    <RadioButton Content="3. Ghi lại thành nợ -> Tạm khóa mượn sách do có công nợ"
+                                 IsChecked="{Binding IsDebtSelected}"
+                                 Margin="0,0,0,8" />
+
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Footer: Nút Xác nhận trả toàn bộ -->
+        <Border Grid.Row="4" Margin="0,16,0,0">
+            <Button Style="{StaticResource SuccessButton}"
+                    HorizontalAlignment="Right"
+                    Height="44"
+                    Padding="24,10"
+                    Command="{Binding ConfirmReturnCommand}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="BookCheck" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="XÁC NHẬN TRẢ TOÀN BỘ SÁCH" VerticalAlignment="Center" FontWeight="Bold" />
+                </StackPanel>
+            </Button>
+        </Border>
+    </Grid>
+</UserControl>

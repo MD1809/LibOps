@@ -1,0 +1,219 @@
+<UserControl x:Class="LibOps.PresentationLayer.Views.BookListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:LibOps.PresentationLayer.Controls"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             FontFamily="Segoe UI">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Tiêu đề & Nút hành động chính -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="QUẢN LÝ ĐẦU SÁCH VÀ KHO TÀI LIỆU" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="Tra cứu, thêm mới, phân bổ bản sao vật lý và in mã vạch Barcode dán sách" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Style="{StaticResource PrimaryGradientButton}" Margin="0,0,8,0" Command="{Binding AddBookCommand}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="Plus" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Thêm Đầu Sách" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <Button ToolTip="Làm mới trang" Style="{StaticResource OutlineButton}" Command="{Binding RefreshCommand}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="Refresh" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,0,0" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Style="{StaticResource ModernCard}" Padding="12" Margin="0,0,0,16">
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- 1. Tìm kiếm & Lọc thể loại -->
+                <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,4,16,4">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Text="Tìm kiếm:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,8,0" />
+                        <TextBox Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" Tag="Tìm kiếm tài liệu tại đây..." Width="200" Height="38" />
+                    </StackPanel>
+
+                    <!-- Lọc thể loại -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Lọc Thể Loại:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,8,0" />
+                        <ComboBox ItemsSource="{Binding Categories}"
+                                  SelectedItem="{Binding SelectedCategory}"
+                                  DisplayMemberPath="CategoryName"
+                                  Height="38"
+                                  Width="160" />
+                    </StackPanel>
+                </WrapPanel>
+
+                <!-- 2. Các nút chức năng thao tác -->
+                <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,20,0,8">
+                    <Button Style="{StaticResource OutlineButton}" Margin="0,0,10,0" Command="{Binding ViewDetailCommand}" Height="38">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="BookOpenVariant" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="Chi Tiết" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SuccessButton}" Margin="0,0,10,0" Command="{Binding ManageCopiesCommand}" Height="38">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="BarcodeScan" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="Bản Sao Và Barcode" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button ToolTip="Chỉnh sửa sách" Style="{StaticResource OutlineButton}" Margin="0,0,10,0" Command="{Binding EditBookCommand}" Height="38">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="PencilOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,0,0" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button ToolTip="Xóa sách" Style="{StaticResource DangerButton}" Command="{Binding DeleteBookCommand}" Height="38">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="TrashCanOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,0,0" />
+                        </StackPanel>
+                    </Button>
+                </WrapPanel>
+            </WrapPanel>
+        </Border>
+
+        <!-- Bảng danh sách sách -->
+        <Border Grid.Row="2" Style="{StaticResource ModernCard}" Padding="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <DataGrid Grid.Row="0"
+                          ItemsSource="{Binding Books}"
+                          SelectedItem="{Binding SelectedBook}"
+                          MouseDoubleClick="DataGrid_MouseDoubleClick"
+                          Style="{StaticResource ModernDataGrid}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Mã ISBN" Binding="{Binding ISBN}" Width="130">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    <Setter Property="ToolTip" Value="{Binding ISBN}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Tên Tựa Đề Sách" Binding="{Binding Title}" Width="250">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    <Setter Property="ToolTip" Value="{Binding Title}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Thể Loại" Binding="{Binding CategoryName}" Width="150">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    <Setter Property="ToolTip" Value="{Binding CategoryName}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Tác Giả" Binding="{Binding AuthorName}" Width="160">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    <Setter Property="ToolTip" Value="{Binding AuthorName}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Nhà Xuất Bản" Binding="{Binding PublisherName}" Width="150">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    <Setter Property="ToolTip" Value="{Binding PublisherName}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Tổng Số" Binding="{Binding TotalQuantity}" Width="80">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="ToolTip" Value="{Binding TotalQuantity}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Khả Dụng" Binding="{Binding AvailableQuantity}" Width="85">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryGradientBrush}" />
+                                    <Setter Property="ToolTip" Value="{Binding AvailableQuantity}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Vị Trí Kệ" Binding="{Binding ShelfLocation}" Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    <Setter Property="ToolTip" Value="{Binding ShelfLocation}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Giá Bìa" Binding="{Binding Price, StringFormat={}{0:N0} đ}" Width="110">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Left" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="ToolTip" Value="{Binding Price, StringFormat={}{0:N0} đ}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <controls:PaginationControl Grid.Row="1" DataContext="{Binding Paging}" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

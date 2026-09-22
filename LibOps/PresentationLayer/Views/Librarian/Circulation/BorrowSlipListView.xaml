@@ -1,0 +1,234 @@
+<UserControl x:Class="LibOps.PresentationLayer.Views.BorrowSlipListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:LibOps.PresentationLayer.ViewModels"
+             xmlns:controls="clr-namespace:LibOps.PresentationLayer.Controls"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             FontFamily="Segoe UI"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:BorrowSlipListViewModel}"
+             d:DesignHeight="650" d:DesignWidth="1000">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="220"/>
+        </Grid.RowDefinitions>
+
+        <!-- Tiêu đề & Nút tải lại (Header Grid) -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="QUẢN LÝ PHIẾU MƯỢN TRẢ VÀ GIA HẠN SÁCH" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="Tra cứu toàn bộ lịch sử lưu thông, kiểm tra tình trạng hạn trả và gia hạn mượn" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Style="{StaticResource OutlineButton}" Height="38" Command="{Binding RefreshCommand}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="Refresh" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Tải Lại" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Tìm kiếm & Lọc (như trang danh mục đầu sách BookListView) -->
+        <Border Grid.Row="1" Style="{StaticResource ModernCard}" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- 1. PHÍA BÊN TRÁI: Tìm kiếm & Lọc nằm chung một nhóm -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Tìm kiếm:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,8,0" />
+                    <TextBox Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" 
+                             Tag="Tìm kiếm phiếu mượn..." 
+                             Width="260" Height="38" Margin="0,0,16,0" />
+
+                    <!-- Lọc Trạng Thái -->
+                    <TextBlock Text="Lọc Trạng Thái:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,8,0" />
+                    <ComboBox SelectedValuePath="Tag" 
+                              SelectedValue="{Binding SelectedStatusFilter, UpdateSourceTrigger=PropertyChanged}"
+                              Height="38" 
+                              Width="220">
+                        <ComboBoxItem Content="-- Tất cả trạng thái --" Tag="ALL" IsSelected="True"/>
+                        <ComboBoxItem Tag="BORROWING">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="BookOpenPageVariantOutline" Width="13" Height="13" Foreground="{StaticResource PrimaryLightBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="Đang mượn (BORROWING)" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </ComboBoxItem>
+                        <ComboBoxItem Tag="RETURNED">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="CheckCircleOutline" Width="13" Height="13" Foreground="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="Đã trả hết (RETURNED)" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </ComboBoxItem>
+                        <ComboBoxItem Tag="PARTIALLY_RETURNED">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="AlertOutline" Width="13" Height="13" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="Trả một phần" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- 2. PHÍA BÊN PHẢI: Các nút chức năng -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Command="{Binding RenewSlipCommand}" Style="{StaticResource PrimaryGradientButton}" Height="38">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="CalendarClock" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="Gia Hạn Phiếu" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Bảng danh sách phiếu mượn trả -->
+        <Border Grid.Row="2" Style="{StaticResource ModernCard}" Padding="0" Margin="0,0,0,16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <DataGrid Grid.Row="0"
+                          ItemsSource="{Binding BorrowSlips}"
+                          SelectedItem="{Binding SelectedSlip}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Mã Phiếu" Binding="{Binding SlipCode}" FontWeight="Bold" Width="140">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Mã Độc Giả" Binding="{Binding MemberCardCode}" Width="120">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Tên Độc Giả" Binding="{Binding MemberFullName}" Width="*"/>
+                        <DataGridTextColumn Header="Ngày Mượn" Binding="{Binding BorrowDate, StringFormat=dd/MM/yyyy}" Width="100">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Hạn Trả Gốc" Binding="{Binding DueDate, StringFormat=dd/MM/yyyy}" Width="100">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Gia Hạn" Binding="{Binding RenewalCountFormatted}" Width="80">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Trạng Thái" Binding="{Binding StatusDisplay}" Width="180"/>
+                        <DataGridTextColumn Header="Thủ Thư Lập" Binding="{Binding CreatedByUserName}" Width="160"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <controls:PaginationControl Grid.Row="1" DataContext="{Binding Paging}" />
+            </Grid>
+        </Border>
+
+        <!-- Detail Panel (Items inside selected slip) -->
+        <Border Grid.Row="3" Style="{StaticResource ModernCard}" Padding="14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                    <iconPacks:PackIconMaterial Kind="BookMultipleOutline" Width="15" Height="15" Foreground="{StaticResource PrimaryGradientBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <TextBlock Text="Chi Tiết Sách Trong Phiếu Mượn Đang Chọn:" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                </StackPanel>
+                <DataGrid Grid.Row="1" Style="{StaticResource ModernDataGrid}" ItemsSource="{Binding SelectedSlipItems}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Mã Vạch" Binding="{Binding Barcode}" FontWeight="Bold" Width="120">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Tựa Đề Sách" Binding="{Binding BookTitle}" Width="*"/>
+                        <DataGridTextColumn Header="Thể Loại" Binding="{Binding CategoryName}" Width="120"/>
+                        <DataGridTextColumn Header="Tình Trạng Mượn" Binding="{Binding BorrowConditionNote}" Width="140"/>
+                        <DataGridTextColumn Header="Trạng Thái Trả" Binding="{Binding ReturnStatusDisplay}" Width="130"/>
+                        <DataGridTextColumn Header="Ngày Trả Thực Tế" Binding="{Binding ActualReturnDate, StringFormat=dd/MM/yyyy HH:mm}" Width="140">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Tiền Phạt" Binding="{Binding FineAmount, StringFormat={}{0:N0} đ}" Width="100">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                    <Setter Property="Padding" Value="0,0,10,0" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

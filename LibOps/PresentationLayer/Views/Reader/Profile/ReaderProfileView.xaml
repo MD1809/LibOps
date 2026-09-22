@@ -1,0 +1,374 @@
+<UserControl x:Class="LibOps.PresentationLayer.Views.ReaderProfileView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:LibOps.PresentationLayer.ViewModels"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:ReaderProfileViewModel}"
+             FontFamily="Segoe UI">
+
+    <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="0,0,0,24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 1. HEADER & ACTION BAR -->
+            <Grid Grid.Row="0" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="THÔNG TIN HỒ SƠ CÁ NHÂN" FontSize="19" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock Text="Tra cứu chi tiết hồ sơ định danh cá nhân, dữ liệu liên hệ và quản trị an toàn bảo mật tài khoản" FontSize="12.5" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0" />
+                </StackPanel>
+
+                <Button Grid.Column="1" Command="{Binding RefreshCommand}" Style="{StaticResource OutlineButton}" Height="34" Padding="14,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="Refresh" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="Làm Mới" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- ========================================== -->
+            <!-- 2. HERO PROFILE BANNER & QUICK KPIS        -->
+            <!-- ========================================== -->
+            <Border Grid.Row="1" Style="{StaticResource ModernCard}" Padding="22,20" Margin="0,0,0,16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Avatar Gradient với Initials -->
+                    <Border Grid.Column="0" Width="72" Height="72" CornerRadius="36" Effect="{StaticResource CardShadow}" Margin="0,0,20,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#4F46E5" Offset="0.0"/>
+                                <GradientStop Color="#7C3AED" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Grid>
+                            <TextBlock Text="{Binding AvatarInitials, FallbackValue='DG'}" 
+                                       FontSize="24" FontWeight="Bold" Foreground="#FFFFFF" 
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Tên độc giả & Huy hiệu -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding MemberProfile.FullName, FallbackValue='ĐỘC GIẢ THƯ VIỆN'}" 
+                                   FontSize="21" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                        <WrapPanel Margin="0,8,0,0">
+
+                            <!-- Trạng thái thẻ Badge -->
+                            <Border Background="#ECFDF5" BorderBrush="#A7F3D0" BorderThickness="1" CornerRadius="6" Padding="10,4" Margin="0,0,8,4">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="CheckCircleOutline" Width="13" Height="13" Foreground="#059669" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{Binding MemberCardSummary.CardStatusDisplay, FallbackValue='Đang hoạt động'}" FontSize="12" FontWeight="SemiBold" Foreground="#059669"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Vai trò Badge -->
+                            <Border Background="#F1F5F9" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="10,4" Margin="0,0,8,4">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="ShieldAccountOutline" Width="13" Height="13" Foreground="#475569" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{Binding RoleDisplay, FallbackValue='Độc Giả Thư Viện'}" FontSize="12" FontWeight="Medium" Foreground="#475569"/>
+                                </StackPanel>
+                            </Border>
+                        </WrapPanel>
+                    </StackPanel>
+
+                    <!-- 3 Khối Thống Kê Nhanh (Mini KPIs) -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Sách Đang Mượn -->
+                        <Border Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="10" Padding="16,12" MinWidth="120" Margin="0,0,10,0">
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="BookOpenPageVariantOutline" Width="14" Height="14" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Đang Mượn" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding MemberCardSummary.ActiveBorrowCount, StringFormat='{}{0} cuốn', FallbackValue='0 cuốn'}" 
+                                           FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Tiền Cọc Khả Dụng -->
+                        <Border Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="10" Padding="16,12" MinWidth="130" Margin="0,0,10,0">
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="CashMultiple" Width="14" Height="14" Foreground="#059669" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Tiền Cọc" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding FormattedDeposit, FallbackValue='0 đ'}" 
+                                           FontSize="16" FontWeight="Bold" Foreground="#059669" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Thời Hạn Thẻ -->
+                        <Border Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="10" Padding="16,12" MinWidth="125">
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="ClockOutline" Width="14" Height="14" Foreground="#D97706" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Hạn Thẻ" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding DaysRemainingText, FallbackValue='Còn 365 ngày'}" 
+                                           FontSize="14" FontWeight="Bold" Foreground="#D97706" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 3. MAIN 2-COLUMN SECTION  -->
+            <Grid Grid.Row="2" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="360"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- CỘT TRÁI: THÔNG TIN HỆ THỐNG & TÀI KHOẢN   -->
+                <Border Grid.Column="0" Style="{StaticResource ModernCard}" Padding="22,20" Margin="0,0,16,0">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                            <Border Width="34" Height="34" CornerRadius="17" Background="#EEF2FF" Margin="0,0,12,0">
+                                <iconPacks:PackIconMaterial Kind="AccountCogOutline" Width="18" Height="18" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="THÔNG TIN TÀI KHOẢN" FontSize="14.5" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Thông số xác thực Và quyền truy cập" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Mã số độc giả -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="BadgeAccountOutline" Width="14" Height="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Mã độc giả:" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{Binding MemberProfile.MemberCardCode, FallbackValue='DG-0000'}" FontSize="13" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <Border Height="1" Background="#F1F5F9" Margin="0,0,0,12"/>
+
+                        <!-- Quyền hạn hệ thống -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="ShieldCheckOutline" Width="14" Height="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Quyền hạn:" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" Text="Độc Giả Trực Tuyến" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <Border Height="1" Background="#F1F5F9" Margin="0,0,0,12"/>
+
+                        <!-- Ngày cấp thẻ -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="CalendarCheckOutline" Width="14" Height="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Ngày mở thẻ:" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{Binding FormattedIssueDate}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <Border Height="1" Background="#F1F5F9" Margin="0,0,0,12"/>
+
+                        <!-- Ngày hết hạn -->
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="CalendarClockOutline" Width="14" Height="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Hết hạn thẻ:" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{Binding FormattedExpiryDate}" FontSize="13" FontWeight="Bold" Foreground="#059669" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <!-- Nút Quyền Lợi Thẻ -->
+                        <Button Command="{Binding ViewCardBenefitsCommand}" Style="{StaticResource OutlineButton}" Height="36" HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="InformationOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="Xem Quyền Lợi Và Quy Định Thẻ" VerticalAlignment="Center" FontSize="12.5"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- CỘT PHẢI: THÔNG TIN ĐỊNH DANH & LIÊN HỆ   -->
+                <Border Grid.Column="1" Style="{StaticResource ModernCard}" Padding="24,20">
+                    <StackPanel>
+                        <!-- Header Card -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                            <Border Width="34" Height="34" CornerRadius="17" Background="#EEF2FF" Margin="0,0,12,0">
+                                <iconPacks:PackIconMaterial Kind="CardAccountDetailsOutline" Width="18" Height="18" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="THÔNG TIN ĐỊNH DANH VÀ LIÊN HỆ" FontSize="14.5" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Hồ sơ nhân thân và kênh liên lạc chính thức với thư viện" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Grid Tiles Thông Tin -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 1. Số CCCD / CMND -->
+                            <Border Grid.Row="0" Grid.Column="0" Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="10" Padding="14,12" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Width="38" Height="38" CornerRadius="19" Background="#EEF2FF" Margin="0,0,12,0">
+                                        <iconPacks:PackIconMaterial Kind="IdCard" Width="19" Height="19" Foreground="#4F46E5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Số CCCD / CMND" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding MemberProfile.IdentityCardNumber, FallbackValue='Chưa cập nhật'}" 
+                                                   FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- 2. Ngày Sinh -->
+                            <Border Grid.Row="0" Grid.Column="2" Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="10" Padding="14,12" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Width="38" Height="38" CornerRadius="19" Background="#FDF2F8" Margin="0,0,12,0">
+                                        <iconPacks:PackIconMaterial Kind="CakeVariantOutline" Width="19" Height="19" Foreground="#EC4899" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Ngày Sinh" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding FormattedBirthDate, FallbackValue='Chưa cập nhật'}" 
+                                                   FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- 3. Số Điện Thoại -->
+                            <Border Grid.Row="1" Grid.Column="0" Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="10" Padding="14,12" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Width="38" Height="38" CornerRadius="19" Background="#ECFDF5" Margin="0,0,12,0">
+                                        <iconPacks:PackIconMaterial Kind="PhoneOutline" Width="19" Height="19" Foreground="#059669" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Số Điện Thoại" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding MemberProfile.PhoneNumber, FallbackValue='Chưa cập nhật'}" 
+                                                   FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- 4. Địa Chỉ Email -->
+                            <Border Grid.Row="1" Grid.Column="2" Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="10" Padding="14,12" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Width="38" Height="38" CornerRadius="19" Background="#FEF3C7" Margin="0,0,12,0">
+                                        <iconPacks:PackIconMaterial Kind="EmailOutline" Width="19" Height="19" Foreground="#D97706" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Địa Chỉ Email" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding MemberProfile.Email, FallbackValue='Chưa cập nhật'}" 
+                                                   FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- 5. Địa Chỉ Thường Trú (Full width 2 cột) -->
+                            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="10" Padding="14,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Width="38" Height="38" CornerRadius="19" Background="#F5F3FF" Margin="0,0,12,0">
+                                        <iconPacks:PackIconMaterial Kind="MapMarkerOutline" Width="19" Height="19" Foreground="#7C3AED" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Địa Chỉ Thường Trú" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding MemberProfile.Address, FallbackValue='Chưa cập nhật'}" 
+                                                   FontSize="13.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ========================================== -->
+            <!-- 4. TRUNG TÂM AN TOÀN & BẢO MẬT MẬT KHẨU    -->
+            <!-- ========================================== -->
+            <Border Grid.Row="3" Style="{StaticResource ModernCard}" Padding="22,20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,24,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <Border Width="30" Height="30" CornerRadius="15" Background="#ECFDF5" Margin="0,0,10,0">
+                                <iconPacks:PackIconMaterial Kind="ShieldCheckOutline" Width="17" Height="17" Foreground="#059669" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="TRUNG TÂM AN TOÀN &amp; BẢO MẬT TÀI KHOẢN" FontSize="14.5" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="Mật khẩu của bạn được mã hóa an toàn theo tiêu chuẩn SHA-256 một chiều kết hợp chuỗi Salt bảo mật chống giải mã. Khuyến nghị thay đổi mật khẩu định kỳ để nâng cao an toàn." 
+                                   FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="18" Margin="40,0,0,0"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" Command="{Binding ChangePasswordCommand}" Style="{StaticResource PrimaryGradientButton}" Height="38" Padding="20,0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="KeyChange" Width="15" Height="15" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="Đổi Mật Khẩu" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+        </Grid>
+    </ScrollViewer>
+</UserControl>

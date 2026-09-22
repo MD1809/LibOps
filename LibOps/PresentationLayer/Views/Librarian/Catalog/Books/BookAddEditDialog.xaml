@@ -1,0 +1,282 @@
+<Window x:Class="LibOps.PresentationLayer.Views.BookAddEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        Title="{Binding DialogTitle}"
+        Width="800" Height="760"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource BgLightBrush}"
+        FontFamily="Segoe UI">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Tiêu đề Dialog -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <TextBlock Text="{Binding DialogTitle}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Form nhập liệu -->
+        <Border Grid.Row="1" Style="{StaticResource ModernCard}" Padding="20">
+            <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                <StackPanel>
+                    
+                    <!-- Thông báo lỗi nếu có -->
+                    <Border Background="#FEE2E2" BorderBrush="{StaticResource ErrorBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,14"
+                            Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource ErrorBrush}" FontSize="12.5" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    </Border>
+
+                    <!-- Khối thông tin đầu: Cột trái (Ảnh bìa) & Cột phải (Thông tin cơ bản) -->
+                    <Grid Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Cột 0: Khung ảnh bìa tài liệu -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Ảnh Bìa Sách" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,6" />
+                            
+                            <!-- Khung xem trước ảnh bìa -->
+                            <Border Width="160" Height="200" Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="8" SnapsToDevicePixels="True" ClipToBounds="True">
+                                <Grid>
+                                    <!-- Ảnh hiển thị khi đã chọn -->
+                                    <Image Source="{Binding CoverImagePath, Converter={StaticResource CoverImageConverter}}" Stretch="UniformToFill" 
+                                           Visibility="{Binding HasCoverImage, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    
+                                    <!-- Placeholder khi chưa có ảnh -->
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                Visibility="{Binding HasCoverImage, Converter={StaticResource BoolToActiveStatusConverter}, ConverterParameter=Invert}">
+                                        <iconPacks:PackIconMaterial Kind="ImageOutline" Width="36" Height="36" Foreground="{StaticResource SlateMutedBrush}" HorizontalAlignment="Center" Margin="0,0,0,6" />
+                                        <TextBlock Text="Chưa có ảnh bìa" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Nút thao tác ảnh -->
+                            <Button Style="{StaticResource OutlineButton}" Height="34" Margin="0,8,0,4" Command="{Binding ChooseCoverImageCommand}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="ImagePlus" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <TextBlock Text="Chọn Ảnh Bìa" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button Style="{StaticResource DangerButton}" Height="32" Command="{Binding RemoveCoverImageCommand}"
+                                    Visibility="{Binding HasCoverImage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="TrashCanOutline" Width="13" Height="13" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <TextBlock Text="Xóa Ảnh" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Cột 2: Tên sách, ISBN, Giá bìa, Thể loại -->
+                        <StackPanel Grid.Column="2">
+                            <!-- Tên sách -->
+                            <TextBlock Text="Tên Tựa Đề Sách (*)" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ModernTextBox}" 
+                                     Tag="Nhập tên tựa đề tài liệu / sách..."
+                                     Height="36" Margin="0,0,0,10" />
+
+                            <!-- ISBN & Giá bìa -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="12" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Mã Chuẩn ISBN (*)" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding ISBN, UpdateSourceTrigger=PropertyChanged}" 
+                                             Style="{StaticResource ModernTextBox}" 
+                                             Tag="Ví dụ: 978-604-..."
+                                             Height="36" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Giá Bìa (VNĐ) (*)" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding PriceInput, UpdateSourceTrigger=PropertyChanged}" 
+                                             Style="{StaticResource ModernTextBox}" 
+                                             Tag="Nhập giá bìa (VNĐ)"
+                                             Height="36" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Thể loại -->
+                            <StackPanel Margin="0,0,0,0">
+                                <TextBlock Text="Thể Loại (*)" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox Grid.Column="0"
+                                              ItemsSource="{Binding Categories}"
+                                              SelectedValuePath="CategoryId"
+                                              DisplayMemberPath="CategoryName"
+                                              SelectedValue="{Binding SelectedCategoryId}"
+                                              Style="{StaticResource ModernComboBox}" Height="36" />
+                                    <Button Grid.Column="2" Style="{StaticResource OutlineButton}" ToolTip="Thêm nhanh thể loại mới" Height="36" Padding="10,0" Command="{Binding QuickAddCategoryCommand}">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <iconPacks:PackIconMaterial Kind="Plus" Width="12" Height="12" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Khối Tác Giả (Hỗ trợ nhiều tác giả & Tạo nhanh) -->
+                    <Border Background="#F8FAFC" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,14">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
+                                <iconPacks:PackIconMaterial Kind="AccountMultipleOutline" Width="16" Height="16" Foreground="{StaticResource PrimaryGradientBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="Danh Sách Tác Giả (*)" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Hàng chọn tác giả, tạo mới & bấm thêm (Cùng một dòng) -->
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <ComboBox Grid.Column="0" 
+                                          ItemsSource="{Binding Authors}"
+                                          SelectedItem="{Binding SelectedAuthorToAdd}"
+                                          Text="{Binding AuthorInputText, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMemberPath="AuthorName"
+                                          IsEditable="True"
+                                          IsTextSearchEnabled="True"
+                                          Style="{StaticResource ModernComboBox}" 
+                                          Height="36" />
+
+                                <Button Grid.Column="2" Style="{StaticResource OutlineButton}" ToolTip="Thêm nhanh tác giả mới vào hệ thống" Height="36" Padding="10,0" Command="{Binding QuickAddAuthorCommand}">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <iconPacks:PackIconMaterial Kind="AccountPlusOutline" Width="13" Height="13" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Grid.Column="4" Style="{StaticResource SuccessButton}" Height="36" Padding="14,0" Command="{Binding AddAuthorToBookCommand}">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <iconPacks:PackIconMaterial Kind="Plus" Width="13" Height="13" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                        <TextBlock Text="Thêm Tác Giả" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <!-- Danh sách các tác giả đã chọn dạng Tag Chips -->
+                            <ItemsControl ItemsSource="{Binding SelectedAuthors}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#EEF2FF" BorderBrush="#C7D2FE" BorderThickness="1" CornerRadius="6" Padding="8,4" Margin="0,4,8,4">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <iconPacks:PackIconMaterial Kind="AccountOutline" Width="10" Height="10" Foreground="{StaticResource PrimaryGradientBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                                <TextBlock Text="{Binding AuthorName}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                                <Button Background="Transparent" BorderThickness="0" Height="18" Width="18" Padding="0" Cursor="Hand" ToolTip="Xóa tác giả này khỏi sách"
+                                                        Command="{Binding DataContext.RemoveAuthorFromBookCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}">
+                                                    <iconPacks:PackIconMaterial Kind="Close" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                </Button>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Nhà xuất bản & Năm XB -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="160" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Nhà Xuất Bản (*)" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="5" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ComboBox Grid.Column="0"
+                                          ItemsSource="{Binding Publishers}"
+                                          SelectedValuePath="PublisherId"
+                                          DisplayMemberPath="PublisherName"
+                                          SelectedValue="{Binding SelectedPublisherId}"
+                                          Text="{Binding PublisherInputText, UpdateSourceTrigger=PropertyChanged}"
+                                          IsEditable="True"
+                                          IsTextSearchEnabled="True"
+                                          Style="{StaticResource ModernComboBox}" Height="36" />
+                                <Button Grid.Column="2" Style="{StaticResource OutlineButton}" ToolTip="Thêm nhanh nhà xuất bản mới" Height="36" Padding="10,0" Command="{Binding QuickAddPublisherCommand}">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <iconPacks:PackIconMaterial Kind="Plus" Width="13" Height="13" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Năm Xuất Bản" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding PublishYear, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ModernTextBox}" 
+                                     Tag="Năm XB"
+                                     Height="36" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Vị trí kệ lưu trữ -->
+                    <TextBlock Text="Vị Trí Giá Kệ Lưu Trữ (Ví dụ: Kệ A1 - Ngăn 2)" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                    <TextBox Text="{Binding ShelfLocation, UpdateSourceTrigger=PropertyChanged}" 
+                             Style="{StaticResource ModernTextBox}" 
+                             Tag="Vị trí đặt sách trong kho..."
+                             Height="36" Margin="0,0,0,12" />
+
+                    <!-- Tóm tắt nội dung -->
+                    <TextBlock Text="Tóm Tắt Nội Dung Sách" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                    <TextBox Text="{Binding Summary, UpdateSourceTrigger=PropertyChanged}" 
+                             Style="{StaticResource ModernTextBox}" 
+                             Tag="Tóm tắt ngắn gọn nội dung tài liệu..."
+                             Height="75" AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top" Padding="8, 10"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Nút thao tác dưới đáy -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Style="{StaticResource OutlineButton}" Width="120" Height="38" Margin="0,0,10,0" Click="BtnCancel_Click" IsCancel="True">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="CloseCircleOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <TextBlock Text="Hủy Bỏ" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+            <Button Style="{StaticResource PrimaryGradientButton}" Width="160" Height="38" Command="{Binding SaveCommand}" IsDefault="True">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="ContentSaveOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <TextBlock Text="Lưu Dữ Liệu" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

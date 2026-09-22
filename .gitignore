@@ -1,0 +1,35 @@
+## Visual Studio & Build Outputs
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build & Test Results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+bld/
+[Tt]ests/
+TestResults/
+*.pdb
+*.ilk
+*.aps
+
+## Temporary Files
+*.tmp
+*.bak
+*.[Cc]ache
+*.log
+
+## AI Tools
+.agents/
+.gemini/
