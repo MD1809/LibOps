@@ -35,28 +35,33 @@
             </StackPanel>
         </Grid>
 
-        <Border Grid.Row="1" Style="{StaticResource ModernCard}" Padding="12" Margin="0,0,0,16">
-            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <!-- 1. Tìm kiếm & Lọc thể loại -->
-                <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,4,16,4">
+        <Border Grid.Row="1" Style="{StaticResource ModernCard}" Padding="16,12" Margin="0,0,0,16">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- 1. Tìm kiếm & Lọc thể loại (Bên trái) -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
                         <TextBlock Text="Tìm kiếm:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,8,0" />
-                        <TextBox Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" Tag="Tìm kiếm tài liệu tại đây..." Width="200" Height="38" />
+                        <TextBox Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" Tag="Tìm kiếm tài liệu tại đây..." Width="220" Height="38" />
                     </StackPanel>
 
-                    <!-- Lọc thể loại -->
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="Lọc Thể Loại:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,8,0" />
                         <ComboBox ItemsSource="{Binding Categories}"
                                   SelectedItem="{Binding SelectedCategory}"
                                   DisplayMemberPath="CategoryName"
                                   Height="38"
-                                  Width="160" />
+                                  Width="180" />
                     </StackPanel>
-                </WrapPanel>
+                </StackPanel>
 
-                <!-- 2. Các nút chức năng thao tác -->
-                <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,20,0,8">
+                <!-- 2. Các nút chức năng thao tác (Bên phải) -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
                     <Button Style="{StaticResource OutlineButton}" Margin="0,0,10,0" Command="{Binding ViewDetailCommand}" Height="38">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <iconPacks:PackIconMaterial Kind="BookOpenVariant" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
@@ -82,8 +87,8 @@
                             <iconPacks:PackIconMaterial Kind="TrashCanOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,0,0" />
                         </StackPanel>
                     </Button>
-                </WrapPanel>
-            </WrapPanel>
+                </StackPanel>
+            </Grid>
         </Border>
 
         <!-- Bảng danh sách sách -->
@@ -180,7 +185,6 @@
                                     <Setter Property="HorizontalAlignment" Value="Center" />
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                     <Setter Property="FontWeight" Value="SemiBold" />
-                                    <Setter Property="Foreground" Value="{StaticResource PrimaryGradientBrush}" />
                                     <Setter Property="ToolTip" Value="{Binding AvailableQuantity}" />
                                 </Style>
                             </DataGridTextColumn.ElementStyle>

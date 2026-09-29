@@ -60,14 +60,14 @@
                     Background="#F1F5F9" BorderBrush="#E2E8F0" BorderThickness="1" 
                     CornerRadius="6" Padding="10,5">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <iconPacks:PackIconMaterial Kind="FormatListNumbered" Width="14" Height="14" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                    <iconPacks:PackIconMaterial Kind="FormatListNumbered" Width="14" Height="14" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,7,0"/>
                     <TextBlock VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}">
                         <Run Text="Hiển thị " />
                         <Run Text="{Binding StartItemIndex, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                         <Run Text=" - " />
                         <Run Text="{Binding EndItemIndex, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                         <Run Text=" / " Foreground="#94A3B8" />
-                        <Run Text="{Binding TotalItems, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource BrandIndigoBrush}" />
+                        <Run Text="{Binding TotalItems, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                         <Run Text=" bản ghi" />
                     </TextBlock>
                 </StackPanel>
@@ -101,7 +101,6 @@
                         Margin="0,0,6,0"
                         VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <iconPacks:PackIconMaterial Kind="BookOpenPageVariantOutline" Width="13" Height="13" Foreground="#7C3AED" VerticalAlignment="Center" Margin="0,0,6,0"/>
                         <TextBlock VerticalAlignment="Center" FontSize="12">
                             <Run Text="Trang " Foreground="#6B7280" />
                             <Run Text="{Binding CurrentPage, Mode=OneWay}" FontWeight="Bold" Foreground="#7C3AED" />
@@ -115,14 +114,14 @@
                 <Button Command="{Binding NextPageCommand}" 
                         Style="{StaticResource PagingNavButton}" 
                         Margin="0,0,4,0" 
-                        ToolTip="Trang sau (Next)">
+                        ToolTip="Trang sau">
                     <iconPacks:PackIconMaterial Kind="ChevronRight" Width="16" Height="16" VerticalAlignment="Center"/>
                 </Button>
 
                 <!-- Last Page -->
                 <Button Command="{Binding LastPageCommand}" 
                         Style="{StaticResource PagingNavButton}" 
-                        ToolTip="Trang cuối (Last)">
+                        ToolTip="Trang cuối">
                     <iconPacks:PackIconMaterial Kind="ChevronDoubleRight" Width="15" Height="15" VerticalAlignment="Center"/>
                 </Button>
             </StackPanel>
