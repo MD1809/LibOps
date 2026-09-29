@@ -587,6 +587,32 @@
         </Setter>
     </Style>
 
+    <!-- Modern ComboBox Editable TextBox Style (Loại bỏ viền lồng nhau bên trong) -->
+    <Style x:Key="ModernComboBoxEditableTextBox" TargetType="TextBox">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="AllowDrop" Value="True" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst" />
+        <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <ScrollViewer x:Name="PART_ContentHost" 
+                                  Background="Transparent" 
+                                  Focusable="False" 
+                                  HorizontalScrollBarVisibility="Hidden" 
+                                  VerticalScrollBarVisibility="Hidden" 
+                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Modern ComboBox Style -->
     <Style x:Key="ModernComboBox" TargetType="ComboBox">
         <Setter Property="Background" Value="White" />
@@ -604,7 +630,17 @@
                     <Grid x:Name="templateRoot" SnapsToDevicePixels="true">
                         <ToggleButton x:Name="toggleButton" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClickMode="Press" Focusable="false" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Template="{StaticResource ModernComboBoxToggleButton}" />
                         <ContentPresenter x:Name="contentPresenter" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" IsHitTestVisible="false" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                        <TextBox x:Name="PART_EditableTextBox" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}" Margin="{TemplateBinding Padding}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Foreground="{TemplateBinding Foreground}" FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" />
+                        <TextBox x:Name="PART_EditableTextBox" Style="{StaticResource ModernComboBoxEditableTextBox}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}" Margin="{TemplateBinding Padding}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Foreground="{TemplateBinding Foreground}" FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" />
+                        <TextBlock x:Name="placeholderText" 
+                                   Text="{TemplateBinding Tag}" 
+                                   Foreground="{StaticResource TextSecondaryBrush}" 
+                                   FontSize="{TemplateBinding FontSize}"
+                                   FontFamily="{TemplateBinding FontFamily}"
+                                   Margin="{TemplateBinding Padding}"
+                                   Padding="2,0,0,0"
+                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                   IsHitTestVisible="False" 
+                                   Visibility="Collapsed" />
                         <Popup x:Name="PART_Popup" AllowsTransparency="true" Focusable="false" IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" Placement="Bottom" PopupAnimation="Slide" VerticalOffset="4">
                             <Border x:Name="dropDownBorder" Background="White" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="6" MaxHeight="{TemplateBinding MaxDropDownHeight}" MinWidth="{Binding ActualWidth, ElementName=templateRoot}" Effect="{StaticResource CardShadow}" SnapsToDevicePixels="True" Padding="4">
                                 <ScrollViewer x:Name="DropDownScrollViewer" CanContentScroll="true">
@@ -614,6 +650,27 @@
                         </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsEditable" Value="False" />
+                                <Condition Property="SelectedItem" Value="{x:Null}" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="placeholderText" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsEditable" Value="True" />
+                                <Condition Property="Text" Value="" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="placeholderText" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsEditable" Value="True" />
+                                <Condition Property="Text" Value="{x:Null}" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="placeholderText" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
                         <Trigger Property="IsEditable" Value="true">
                             <Setter Property="IsTabStop" Value="false" />
                             <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible" />
@@ -626,6 +683,10 @@
                             <Setter Property="BorderBrush" Value="{StaticResource BrandIndigoLightBrush}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="true">
+                            <Setter Property="BorderBrush" Value="{StaticResource BrandIndigoBrush}" />
+                            <Setter Property="BorderThickness" Value="1.5" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="true">
                             <Setter Property="BorderBrush" Value="{StaticResource BrandIndigoBrush}" />
                             <Setter Property="BorderThickness" Value="1.5" />
                         </Trigger>

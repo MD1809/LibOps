@@ -391,18 +391,8 @@ namespace LibOps.PresentationLayer.ViewModels
                 {
                     Authors.Add(a);
                 }
-                if (Authors.Count > 0 && SelectedAuthorToAdd == null)
-                {
-                    SelectedAuthorToAdd = Authors[0];
-                }
-                if (Authors.Count > 0 && SelectedAuthorId == 0)
-                {
-                    SelectedAuthorId = Authors[0].AuthorId;
-                    if (IsNewBook && SelectedAuthors.Count == 0)
-                    {
-                        SelectedAuthors.Add(Authors[0]);
-                    }
-                }
+                SelectedAuthorToAdd = null;
+                AuthorInputText = string.Empty;
 
                 Publishers.Clear();
                 foreach (var p in _metadataService.GetAllPublishers())
