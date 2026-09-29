@@ -118,6 +118,8 @@ namespace LibOps.PresentationLayer.MvvmCore
             OnPropertyChanged(nameof(EndItemIndex));
             OnPropertyChanged(nameof(PageSummaryText));
             OnPropertyChanged(nameof(PageDisplayInfo));
+
+            System.Windows.Input.CommandManager.InvalidateRequerySuggested();
         }
     }
 }

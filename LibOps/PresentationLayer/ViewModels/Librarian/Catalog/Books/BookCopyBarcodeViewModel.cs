@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -127,7 +127,8 @@ namespace LibOps.PresentationLayer.ViewModels
             ? new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#EF4444"))
             : new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#10B981"));
 
-        public ObservableCollection<BookCopyGridDisplayDto> Copies { get; }
+        public PaginationController<BookCopyGridDisplayDto> Paging { get; } = new PaginationController<BookCopyGridDisplayDto>(10);
+        public ObservableCollection<BookCopyGridDisplayDto> Copies => Paging.CurrentPageItems;
         public ObservableCollection<BookGridDisplayDto> AllBooks { get; }
 
         public ICommand GenerateCopiesCommand { get; }
@@ -140,7 +141,6 @@ namespace LibOps.PresentationLayer.ViewModels
         {
             _bookService = new BookService();
 
-            Copies = new ObservableCollection<BookCopyGridDisplayDto>();
             AllBooks = new ObservableCollection<BookGridDisplayDto>();
 
             GenerateCopiesCommand = new RelayCommand(GenerateCopies);
@@ -189,24 +189,17 @@ namespace LibOps.PresentationLayer.ViewModels
 
                 BookInfo = _bookService.GetBookById(BookId);
 
-                Copies.Clear();
-                var list = _bookService.GetCopiesByBookId(BookId);
-                if (list != null)
-                {
-                    foreach (var c in list)
-                    {
-                        Copies.Add(c);
-                    }
-                }
+                var list = _bookService.GetCopiesByBookId(BookId) ?? new System.Collections.Generic.List<BookCopyGridDisplayDto>();
+                Paging.SetSource(list);
 
-                TotalCopiesCount = Copies.Count;
-                AvailableCopiesCount = Copies.Count(x => x.Status == "AVAILABLE");
-                BorrowedCopiesCount = Copies.Count(x => x.Status == "BORROWED");
-                DamagedOrLostCount = Copies.Count(x => x.Status == "DAMAGED" || x.Status == "LOST");
+                TotalCopiesCount = list.Count;
+                AvailableCopiesCount = list.Count(x => x.Status == "AVAILABLE");
+                BorrowedCopiesCount = list.Count(x => x.Status == "BORROWED");
+                DamagedOrLostCount = list.Count(x => x.Status == "DAMAGED" || x.Status == "LOST");
 
                 SelectedCopy = Copies.FirstOrDefault();
 
-                SetStatus($"Đã tải {Copies.Count} bản sao của đầu sách '{BookInfo?.Title}'.", false);
+                SetStatus($"Đã tải {list.Count} bản sao của đầu sách '{BookInfo?.Title}'.", false);
             }
             catch (Exception ex)
             {

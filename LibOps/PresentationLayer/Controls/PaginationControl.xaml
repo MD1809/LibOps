@@ -61,15 +61,13 @@
                     CornerRadius="6" Padding="10,5">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <iconPacks:PackIconMaterial Kind="FormatListNumbered" Width="14" Height="14" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,7,0"/>
-                    <TextBlock VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}">
-                        <Run Text="Hiển thị " />
-                        <Run Text="{Binding StartItemIndex, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <Run Text=" - " />
-                        <Run Text="{Binding EndItemIndex, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <Run Text=" / " Foreground="#94A3B8" />
-                        <Run Text="{Binding TotalItems, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <Run Text=" bản ghi" />
-                    </TextBlock>
+                    <TextBlock Text="Hiển thị " FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding StartItemIndex}" FontWeight="Bold" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text=" - " FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding EndItemIndex}" FontWeight="Bold" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text=" / " FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding TotalItems}" FontWeight="Bold" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text=" bản ghi" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="2,0,0,0" />
                 </StackPanel>
             </Border>
 
@@ -101,12 +99,10 @@
                         Margin="0,0,6,0"
                         VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock VerticalAlignment="Center" FontSize="12">
-                            <Run Text="Trang " Foreground="#6B7280" />
-                            <Run Text="{Binding CurrentPage, Mode=OneWay}" FontWeight="Bold" Foreground="#7C3AED" />
-                            <Run Text=" / " Foreground="#9CA3AF" />
-                            <Run Text="{Binding TotalPages, Mode=OneWay}" FontWeight="Bold" Foreground="#475569" />
-                        </TextBlock>
+                        <TextBlock Text="Trang " FontSize="12" Foreground="#6B7280" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding CurrentPage}" FontWeight="Bold" FontSize="12" Foreground="#7C3AED" VerticalAlignment="Center" />
+                        <TextBlock Text=" / " FontSize="12" Foreground="#9CA3AF" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding TotalPages}" FontWeight="Bold" FontSize="12" Foreground="#475569" VerticalAlignment="Center" />
                     </StackPanel>
                 </Border>
 
