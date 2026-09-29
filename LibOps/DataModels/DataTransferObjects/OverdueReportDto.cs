@@ -20,5 +20,10 @@ namespace LibOps.DataModels.DataTransferObjects
         public int OverdueDays { get; set; }
         public decimal EstimatedFine { get; set; }
         public decimal DepositBalance { get; set; }
+
+        // Thuộc tính tương thích giao diện
+        public int OverdueBooksCount { get; set; } = 1;
+        public int MaxDaysOverdue => OverdueDays;
+        public decimal TotalFineAmount => EstimatedFine;
     }
 }

@@ -43,10 +43,15 @@ namespace LibOps.PresentationLayer.ViewModels
         private bool _isLoading;
 
         private List<OverdueReportDto> _allOverdueItems = new List<OverdueReportDto>();
+        private List<OverdueReportDto> _filteredOverdueList = new List<OverdueReportDto>();
         private List<FinancialTransactionDisplayDto> _allCashFlowItems = new List<FinancialTransactionDisplayDto>();
+        private List<FinancialTransactionDisplayDto> _filteredCashFlowList = new List<FinancialTransactionDisplayDto>();
 
-        public ObservableCollection<OverdueReportDto> OverdueList { get; }
-        public ObservableCollection<FinancialTransactionDisplayDto> CashFlowTransactions { get; }
+        public PaginationController<OverdueReportDto> OverduePaging { get; } = new PaginationController<OverdueReportDto>(10);
+        public ObservableCollection<OverdueReportDto> OverdueList => OverduePaging.CurrentPageItems;
+
+        public PaginationController<FinancialTransactionDisplayDto> CashFlowPaging { get; } = new PaginationController<FinancialTransactionDisplayDto>(10);
+        public ObservableCollection<FinancialTransactionDisplayDto> CashFlowTransactions => CashFlowPaging.CurrentPageItems;
 
         public bool IsOverdueTabSelected
         {
@@ -220,9 +225,6 @@ namespace LibOps.PresentationLayer.ViewModels
         {
             _reportService = new ReportService();
 
-            OverdueList = new ObservableCollection<OverdueReportDto>();
-            CashFlowTransactions = new ObservableCollection<FinancialTransactionDisplayDto>();
-
             RefreshCommand = new RelayCommand(RefreshCurrentTab);
             ExportCsvCommand = new RelayCommand(ExecuteExportCsv);
             OpenExpiredDebtSettlementCommand = new RelayCommand(ExecuteOpenExpiredDebtSettlement);
@@ -265,7 +267,6 @@ namespace LibOps.PresentationLayer.ViewModels
 
         private void ApplyOverdueFilter()
         {
-            OverdueList.Clear();
             var filtered = _allOverdueItems.AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(OverdueSearchKeyword))
@@ -286,8 +287,10 @@ namespace LibOps.PresentationLayer.ViewModels
             foreach (var item in resultList)
             {
                 item.SequenceNumber = seq++;
-                OverdueList.Add(item);
             }
+
+            _filteredOverdueList = resultList;
+            OverduePaging.SetSource(resultList);
 
             TotalOverdueCount = resultList.Count;
             TotalEstimatedFine = resultList.Sum(x => x.EstimatedFine);
@@ -333,7 +336,6 @@ namespace LibOps.PresentationLayer.ViewModels
 
         private void ApplyCashFlowFilter()
         {
-            CashFlowTransactions.Clear();
             var filtered = _allCashFlowItems.AsEnumerable();
 
             // Lọc theo loại dòng tiền
@@ -360,8 +362,10 @@ namespace LibOps.PresentationLayer.ViewModels
             foreach (var item in resultList)
             {
                 item.SequenceNumber = seq++;
-                CashFlowTransactions.Add(item);
             }
+
+            _filteredCashFlowList = resultList;
+            CashFlowPaging.SetSource(resultList);
         }
 
         #endregion
@@ -374,12 +378,12 @@ namespace LibOps.PresentationLayer.ViewModels
             {
                 if (IsOverdueTabSelected)
                 {
-                    ExcelExportUtility.ExportOverdueReportToExcel(OverdueList);
+                    ExcelExportUtility.ExportOverdueReportToExcel(_filteredOverdueList);
                 }
                 else
                 {
                     ExcelExportUtility.ExportCashFlowReportToExcel(
-                        CashFlowTransactions,
+                        _filteredCashFlowList,
                         FromDate,
                         ToDate,
                         TotalInflow,

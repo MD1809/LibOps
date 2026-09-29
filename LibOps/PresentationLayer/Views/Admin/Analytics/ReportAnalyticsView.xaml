@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:LibOps.PresentationLayer.ViewModels"
              xmlns:conv="clr-namespace:LibOps.PresentationLayer.Converters"
+             xmlns:controls="clr-namespace:LibOps.PresentationLayer.Controls"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance vm:ReportAnalyticsViewModel}"
@@ -82,10 +83,9 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>        
-        <!-- ======================================================== -->
-        <!-- 1. TIÊU ĐỀ PHÂN HỆ VÀ CÁC NÚT HÀNH ĐỘNG CHÍNH           -->
-        <!-- ======================================================== -->
+        </Grid.RowDefinitions>
+        
+        <!-- 1. TIÊU ĐỀ PHÂN HỆ VÀ CÁC NÚT HÀNH ĐỘNG CHÍNH  -->
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="BÁO CÁO THỐNG KÊ VÀ PHÂN TÍCH TÀI CHÍNH" 
@@ -138,9 +138,7 @@
             
         </Grid>
 
-        <!-- ======================================================== -->
-        <!-- 2. THANH CHUYỂN PHÂN HỆ BÁO CÁO (SEGMENTED CONTROL)       -->
-        <!-- ======================================================== -->
+        <!-- 2. THANH CHUYỂN PHÂN HỆ BÁO CÁO (SEGMENTED CONTROL)  -->
         <Border Grid.Row="1" Background="#F1F5F9" CornerRadius="8" Padding="4" Margin="0,0,0,16" HorizontalAlignment="Left">
             <StackPanel Orientation="Horizontal">
                 <!-- Tab 1: Phiếu Mượn Quá Hạn -->
@@ -164,20 +162,17 @@
                 </RadioButton>
             </StackPanel>
         </Border>
-
-        <!-- ======================================================== -->
-        <!-- 3. KHU VỰC NỘI DUNG CHI TIẾT 2 BÁO CÁO                   -->
-        <!-- ======================================================== -->
+        
+        <!-- 3. KHU VỰC NỘI DUNG CHI TIẾT 2 BÁO CÁO  -->
         <Grid Grid.Row="2">
 
-            <!-- ======================================================== -->
-            <!-- TAB 1: BÁO CÁO PHIẾU MƯỢN QUÁ HẠN CHƯA TRẢ               -->
-            <!-- ======================================================== -->
+            <!-- TAB 1: BÁO CÁO PHIẾU MƯỢN QUÁ HẠN CHƯA TRẢ  -->
             <Grid Visibility="{Binding IsOverdueTabSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- 3 THẺ KPI QUÁ HẠN -->
@@ -260,7 +255,8 @@
 
                 <!-- BẢNG DANH SÁCH PHIẾU MƯỢN QUÁ HẠN -->
                 <Border Grid.Row="2" Style="{StaticResource ModernCard}" Padding="0" ClipToBounds="True">
-                    <DataGrid ItemsSource="{Binding OverdueList}" 
+                    <DataGrid Style="{StaticResource ModernDataGrid}"
+                              ItemsSource="{Binding OverdueList}" 
                               AutoGenerateColumns="False" 
                               IsReadOnly="True"
                               ScrollViewer.CanContentScroll="True"
@@ -269,23 +265,27 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="STT" Binding="{Binding SequenceNumber}" Width="50" ElementStyle="{StaticResource CenterAlignedCell}"/>
                             <DataGridTextColumn Header="Mã Phiếu" Binding="{Binding SlipCode}" FontWeight="Bold" Width="120"/>
-                            <DataGridTextColumn Header="Mã Thẻ" Binding="{Binding MemberCardCode}" Width="110"/>
-                            <DataGridTextColumn Header="Họ Và Tên Độc Giả" Binding="{Binding MemberFullName}" FontWeight="SemiBold" Width="170"/>
-                            <DataGridTextColumn Header="Số Sách Trễ" Binding="{Binding OverdueBooksCount}" Width="100" ElementStyle="{StaticResource CenterAlignedCell}"/>
-                            <DataGridTextColumn Header="Số Ngày Quá Hạn" Binding="{Binding MaxDaysOverdue, StringFormat={}{0} ngày}" FontWeight="Bold" Width="135" ElementStyle="{StaticResource CenterAlignedCell}"/>
-                            <DataGridTextColumn Header="Tiền Phạt Dự Kiến" Binding="{Binding TotalFineAmount, StringFormat={}{0:N0} đ}" FontWeight="Bold" Width="145" ElementStyle="{StaticResource RightAlignedCell}"/>
+                            <DataGridTextColumn Header="Mã Thẻ" Binding="{Binding MemberCardCode}" Width="100"/>
+                            <DataGridTextColumn Header="Họ Và Tên Độc GiẢ" Binding="{Binding MemberFullName}" FontWeight="SemiBold" Width="160"/>
+                            <DataGridTextColumn Header="Tên Sách" Binding="{Binding BookTitle}" Width="*"/>
+                            <DataGridTextColumn Header="Mã Vạch" Binding="{Binding Barcode}" Width="110"/>
+                            <DataGridTextColumn Header="Hạn Trả" Binding="{Binding DueDate, StringFormat=dd/MM/yyyy}" Width="100" ElementStyle="{StaticResource CenterAlignedCell}"/>
+                            <DataGridTextColumn Header="Số Ngày Trễ" Binding="{Binding OverdueDays, StringFormat={}{0} ngày}" Width="110" ElementStyle="{StaticResource CenterAlignedCell}"/>
+                            <DataGridTextColumn Header="Tiền Phạt Dự Kiến" Binding="{Binding EstimatedFine, StringFormat={}{0:N0} đ}" Width="135" ElementStyle="{StaticResource RightAlignedCell}"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>
+
+                <!-- PHÂN TRANG BÁO CÁO QUÁ HẠN -->
+                <controls:PaginationControl Grid.Row="3" DataContext="{Binding OverduePaging}" Margin="0,10,0,0" />
             </Grid>
 
-            <!-- ======================================================== -->
             <!-- TAB 2: BÁO CÁO DÒNG TIỀN (MỞ THẺ, NẠP, PHẠT, HOÀN CỌC)    -->
-            <!-- ======================================================== -->
             <Grid Visibility="{Binding IsCashFlowTabSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- BỘ LỌC DÒNG TIỀN: TÌM KIẾM -> LOẠI -> LỌC THEO NGÀY -->
@@ -377,6 +377,9 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>
+
+                <!-- PHÂN TRANG BÁO CÁO DÒNG TIỀN -->
+                <controls:PaginationControl Grid.Row="2" DataContext="{Binding CashFlowPaging}" Margin="0,10,0,0" />
             </Grid>
 
         </Grid>
