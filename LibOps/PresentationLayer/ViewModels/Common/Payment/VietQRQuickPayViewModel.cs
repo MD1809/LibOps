@@ -26,7 +26,7 @@ namespace LibOps.PresentationLayer.ViewModels
         private bool _isExpired;
         private int _countdownSeconds = 300; // 5 phút
         private string _countdownText = "05:00";
-        private string _statusMessage = "📡 Đang khởi tạo mã VietQR từ Cổng PayOS...";
+        private string _statusMessage = "Đang khởi tạo mã VietQR từ Cổng PayOS...";
 
         private DispatcherTimer _countdownTimer;
         private CancellationTokenSource _cts;
@@ -114,7 +114,7 @@ namespace LibOps.PresentationLayer.ViewModels
             try
             {
                 IsLoading = true;
-                StatusMessage = "📡 Đang kết nối Cổng VietQR PayOS...";
+                StatusMessage = "Đang kết nối Cổng VietQR PayOS...";
 
                 // Gọi SDK PayOS tạo đơn hàng
                 PaymentOrder = await _gatewayService.CreatePaymentOrderAsync(
@@ -124,7 +124,7 @@ namespace LibOps.PresentationLayer.ViewModels
                 QrImage = VietQRGeneratorUtility.GenerateQrBitmapSource(PaymentOrder.QrCodeText, 8);
 
                 IsLoading = false;
-                StatusMessage = "📡 Đang chờ bạn quét mã và chuyển khoản...";
+                StatusMessage = "Đang chờ bạn quét mã và chuyển khoản...";
 
                 // Khởi động bộ đếm ngược 5 phút
                 StartCountdownTimer();
@@ -148,7 +148,7 @@ namespace LibOps.PresentationLayer.ViewModels
 
                 QrImage = VietQRGeneratorUtility.GenerateQrBitmapSource(fallbackEmvCoPayload, 8);
 
-                StatusMessage = "📡 Chế độ VietQR Chuẩn NAPAS (Hỗ trợ quét qua tất cả App Ngân Hàng)";
+                StatusMessage = "Chế độ VietQR Chuẩn NAPAS (Hỗ trợ quét qua tất cả App Ngân Hàng)";
 
                 PaymentOrder = new PaymentOrderDto
                 {
@@ -235,7 +235,7 @@ namespace LibOps.PresentationLayer.ViewModels
             _cts?.Cancel();
 
             IsSuccess = true;
-            StatusMessage = "🎉 ĐÃ NHẬN TIỀN THÀNH CÔNG! Đang cập nhật số dư...";
+            StatusMessage = "ĐÃ NHẬN TIỀN THÀNH CÔNG! Đang cập nhật số dư...";
 
             int userId = AuthService.CurrentSession?.UserId ?? 1;
 

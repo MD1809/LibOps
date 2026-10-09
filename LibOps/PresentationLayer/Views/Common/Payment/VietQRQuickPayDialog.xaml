@@ -63,7 +63,6 @@
                     <Border Visibility="{Binding IsSuccess, Converter={StaticResource BooleanToVisibilityConverter}}" 
                             Background="#F0FDF4" BorderBrush="#86EFAC" BorderThickness="1.5" CornerRadius="10" Padding="14,10" Margin="0,0,0,12" Width="380">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <iconPacks:PackIconMaterial Kind="CheckCircle" Width="22" Height="22" Foreground="#16A34A" VerticalAlignment="Center" Margin="0,0,8,0"/>
                             <TextBlock Text="{Binding StatusMessage}" FontSize="12.5" FontWeight="Bold" Foreground="#16A34A" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
@@ -148,14 +147,13 @@
                     <Button Grid.Column="0" Command="{Binding SimulateSuccessCommand}" Style="{StaticResource OutlineButton}" Height="34" HorizontalAlignment="Left" Padding="12,0">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <iconPacks:PackIconMaterial Kind="LightningBolt" Width="13" Height="13" Foreground="#0284C7" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            <TextBlock Text="Mô Phỏng Thanh Toán (Test)" FontSize="11.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text="Mô Phỏng Thanh Toán" FontSize="11.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
                     <!-- Nút Hủy / Đóng -->
                     <Button Grid.Column="1" Command="{Binding CancelCommand}" Style="{StaticResource DangerButton}" Height="34" Padding="16,0">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <iconPacks:PackIconMaterial Kind="Close" Width="13" Height="13" VerticalAlignment="Center" Margin="0,0,5,0"/>
                             <TextBlock Text="Đóng" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
