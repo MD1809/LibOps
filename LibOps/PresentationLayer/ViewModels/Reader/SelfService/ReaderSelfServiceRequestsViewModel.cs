@@ -48,11 +48,20 @@ namespace LibOps.PresentationLayer.ViewModels
             set => SetProperty(ref _isLoading, value);
         }
 
+        private ReaderRequestDisplayDto _selectedRequest;
+
+        public ReaderRequestDisplayDto SelectedRequest
+        {
+            get => _selectedRequest;
+            set => SetProperty(ref _selectedRequest, value);
+        }
+
         public PaginationController<ReaderRequestDisplayDto> Paging { get; } = new PaginationController<ReaderRequestDisplayDto>(10);
         public ObservableCollection<ReaderRequestDisplayDto> MyRequests => Paging.CurrentPageItems;
 
         public ICommand CreateGeneralRequestCommand { get; }
         public ICommand RefreshCommand { get; }
+        public ICommand ViewDetailCommand { get; }
 
         public ReaderSelfServiceRequestsViewModel(UserSessionDto session = null)
         {
@@ -61,6 +70,7 @@ namespace LibOps.PresentationLayer.ViewModels
 
             CreateGeneralRequestCommand = new RelayCommand(ExecuteCreateGeneralRequest);
             RefreshCommand = new RelayCommand(LoadData);
+            ViewDetailCommand = new RelayCommand<ReaderRequestDisplayDto>(ExecuteViewDetail);
 
             LoadData();
         }
@@ -192,6 +202,15 @@ namespace LibOps.PresentationLayer.ViewModels
             {
                 DialogService.ShowError($"Gửi yêu cầu thất bại: {errorMsg}", "Thất Bại");
             }
+        }
+
+        private void ExecuteViewDetail(ReaderRequestDisplayDto request)
+        {
+            var target = request ?? SelectedRequest;
+            if (target == null) return;
+
+            var dialog = new ReaderRequestDetailDialog(target);
+            dialog.ShowDialog();
         }
     }
 }
