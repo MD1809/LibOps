@@ -1,153 +1,149 @@
-﻿<Window x:Class="LibOps.PresentationLayer.Views.Members.MemberRenewCardDialog"
+<Window x:Class="LibOps.PresentationLayer.Views.Members.MemberRenewCardDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        Title="GIA HẠN THẺ ĐỘC GIẢ"
-        Width="540" Height="620"
+        Title="Gia hạn thẻ thư viện"
+        Width="480" Height="540"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="{StaticResource BgLightBrush}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
         FontFamily="Segoe UI">
 
-    <Grid Margin="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Border Background="White" CornerRadius="16" BorderBrush="#CBD5E1" BorderThickness="1" Effect="{StaticResource CardShadow}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <!-- Tiêu đề Dialog -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
-            <iconPacks:PackIconMaterial Kind="CalendarSyncOutline" Width="24" Height="24" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <StackPanel>
-                <TextBlock Text="GIA HẠN THẺ ĐỘC GIẢ" FontSize="18" FontWeight="Bold" Foreground="{StaticResource BrandIndigoBrush}" />
-                <TextBlock Text="Thực hiện thanh toán phí thường niên để gia hạn thời hạn sử dụng thẻ (+1 năm)" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
-            </StackPanel>
-        </StackPanel>
-
-        <!-- Khung nội dung -->
-        <Border Grid.Row="1" Style="{StaticResource ModernCard}" Padding="20">
-            <StackPanel>
-                
-                <!-- Thông báo lỗi nếu có -->
-                <Border Background="#FEE2E2" BorderBrush="{StaticResource ErrorBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,14"
-                        Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
-                    <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource ErrorBrush}" FontSize="12.5" FontWeight="SemiBold" TextWrapping="Wrap" />
-                </Border>
-
-                <!-- Thông tin độc giả & Hạn dùng -->
-                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,16">
-                    <StackPanel>
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding MemberInfo.FullName}" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                            <Border Grid.Column="1" Background="{StaticResource PrimaryLightBrush}" CornerRadius="4" Padding="8,3">
-                                <TextBlock Text="{Binding MemberInfo.MemberCardCode, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}" FontSize="12" />
-                            </Border>
-                        </Grid>
-
-                        <Separator Background="{StaticResource BorderLightBrush}" Margin="0,2,0,8" />
-
-                        <!-- So sánh hạn cũ -> hạn mới -->
-                        <Grid Margin="0,0,0,6">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="Hạn dùng hiện tại:" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" />
-                                <TextBlock Text="{Binding CurrentExpiryDate, StringFormat={}{0:dd/MM/yyyy}}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" Margin="0,2,0,0" />
-                            </StackPanel>
-                            <iconPacks:PackIconMaterial Grid.Column="1" Kind="ArrowRightBold" Width="16" Height="16" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" Margin="8,0" />
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="Hạn mới dự kiến (+1 năm):" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" />
-                                <TextBlock Text="{Binding NewExpiryDate, StringFormat={}{0:dd/MM/yyyy}}" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" FontSize="13.5" Margin="0,2,0,0" />
-                            </StackPanel>
-                        </Grid>
-
-                        <Grid Margin="0,4,0,0">
-                            <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}">
-                                <Run Text="Số dư cọc hiện tại: " />
-                                <Run Text="{Binding MemberInfo.DepositBalance, Mode=OneWay, StringFormat={}{0:N0} VNĐ}" FontWeight="Bold" Foreground="{StaticResource BrandPinkBrush}" />
-                                <Run Text=" (Mức cọc tối thiểu duy trì: " />
-                                <Run Text="{Binding MinDeposit, Mode=OneWay, StringFormat={}{0:N0} VNĐ}" FontWeight="SemiBold" />
-                                <Run Text=")" />
-                            </TextBlock>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-                <!-- Phí thường niên gia hạn -->
-                <Grid Margin="0,0,0,12">
+            <Border Grid.Row="0" CornerRadius="15,15,0,0" Padding="20,16">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#0F172A" Offset="0.0"/>
+                        <GradientStop Color="#312E81" Offset="0.5"/>
+                        <GradientStop Color="#4F46E5" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Phí Thường Niên Gia Hạn (*)" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="1" Text="{Binding RenewalFee, StringFormat={}{0:N0} VNĐ}" FontSize="16" FontWeight="Bold" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" />
-                </Grid>
 
-                <!-- Phương thức thanh toán -->
-                <TextBlock Text="Hình Thức Thanh Toán Phí" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,6" />
-                <ComboBox SelectedValue="{Binding PaymentMethod, Mode=TwoWay}" SelectedValuePath="Tag" Style="{StaticResource ModernComboBox}" Height="38" Margin="0,0,0,6">
-                    <!-- Tùy chọn 1: Tiền mặt tại quầy (Chỉ hiển thị cho Thủ thư) -->
-                    <ComboBoxItem Tag="CASH" Visibility="{Binding IsReaderMode, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-                        <StackPanel Orientation="Horizontal">
-                            <iconPacks:PackIconMaterial Kind="Cash" Width="15" Height="15" Foreground="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                            <TextBlock Text="1. Tiền mặt tại quầy (CASH)" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="CalendarSyncOutline" Width="20" Height="20" Foreground="#C7D2FE" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="Gia hạn thẻ thư viện" FontSize="15" FontWeight="SemiBold" Foreground="White"/>
                         </StackPanel>
-                    </ComboBoxItem>
-                    
-                    <!-- Tùy chọn 2: Quét mã VietQR PayOS (Khuyên dùng - Nhanh chóng & Tự động) -->
-                    <ComboBoxItem Tag="BANK_TRANSFER">
-                        <StackPanel Orientation="Horizontal">
-                            <iconPacks:PackIconMaterial Kind="QrcodeScan" Width="15" Height="15" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                            <TextBlock Text="Quét mã VietQR PayOS (Thanh toán trực tiếp 50k - Tự động)" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </ComboBoxItem>
-                    
-                    <!-- Tùy chọn 3: Khấu trừ Quỹ cọc (Yêu cầu số dư >= 250k) -->
-                    <ComboBoxItem Tag="DEDUCT_DEPOSIT" IsEnabled="{Binding CanDeductFromDeposit}">
-                        <StackPanel Orientation="Horizontal">
-                            <iconPacks:PackIconMaterial Kind="CreditCardCheckOutline" Width="15" Height="15" Foreground="{StaticResource BrandPinkBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                            <TextBlock Text="Khấu trừ từ Quỹ cọc thẻ (Yêu cầu số dư ≥ 250.000 VNĐ)" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </ComboBoxItem>
-                </ComboBox>
-
-                <!-- Gợi ý điều kiện trừ cọc -->
-                <Border Background="#F1F5F9" CornerRadius="6" Padding="8,6" Margin="0,0,0,12">
-                    <StackPanel Orientation="Horizontal">
-                        <iconPacks:PackIconMaterial Kind="InformationOutline" Width="14" Height="14" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
-                        <TextBlock Text="{Binding DeductDepositHint}" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                        <TextBlock Text="Gia hạn thời hạn sử dụng thẻ thêm 1 năm" FontSize="12" Foreground="#C7D2FE" Margin="0,3,0,0"/>
                     </StackPanel>
-                </Border>
 
-                <!-- Ghi chú bổ sung -->
-                <TextBlock Text="Ghi Chú Gia Hạn (Tùy chọn)" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
-                <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" Height="40" AcceptsReturn="True" TextWrapping="Wrap" />
+                    <Button Grid.Column="1" Click="BtnCancel_Click" Width="30" Height="30" Background="#33FFFFFF" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" CornerRadius="15">
+                                    <iconPacks:PackIconMaterial Kind="Close" Width="14" Height="14" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+            </Border>
 
-            </StackPanel>
-        </Border>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="22,16">
+                <StackPanel>
+                    <Border Background="#FEE2E2" BorderBrush="{StaticResource ErrorBrush}" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,12"
+                            Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource ErrorBrush}" FontSize="12" TextWrapping="Wrap" />
+                    </Border>
 
-        <!-- Nút thao tác dưới đáy -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-            <Button Style="{StaticResource OutlineButton}" Width="120" Height="38" Margin="0,0,10,0" Click="BtnCancel_Click" IsCancel="True">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <iconPacks:PackIconMaterial Kind="CloseCircleOutline" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0" />
-                    <TextBlock Text="Đóng (Esc)" VerticalAlignment="Center" />
+                    <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10" Padding="14,12" Margin="0,0,0,14">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding MemberInfo.FullName}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                <Border Grid.Column="1" Background="#EEF2FF" CornerRadius="4" Padding="8,3">
+                                    <TextBlock Text="{Binding MemberInfo.MemberCardCode, Mode=OneWay}" FontWeight="SemiBold" Foreground="#4F46E5" FontSize="11.5" />
+                                </Border>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Hạn dùng hiện tại:" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding CurrentExpiryDate, StringFormat={}{0:dd/MM/yyyy}}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="12.5" Margin="0,2,0,0" />
+                                </StackPanel>
+                                <iconPacks:PackIconMaterial Grid.Column="1" Kind="ArrowRightThin" Width="15" Height="15" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="80,0,90,0" />
+                                <StackPanel Grid.Column="2" Margin="4,0,0,0">
+                                    <TextBlock Text="Hạn mới sau gia hạn:" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding NewExpiryDate, StringFormat={}{0:dd/MM/yyyy}}" FontWeight="SemiBold" Foreground="#10B981" FontSize="12.5" Margin="0,2,0,0" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Số dư tiền cọc hiện có:" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding MemberInfo.DepositBalance, Mode=OneWay, StringFormat={}{0:N0} đ}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10" Padding="14,12" Margin="0,0,0,14">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Phí thường niên:" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding RenewalFee, StringFormat={}{0:N0} đ}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource BrandIndigoBrush}" VerticalAlignment="Center" />
+                            </Grid>
+
+                            <TextBlock Text="Hình thức thanh toán:" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,6" />
+                            <ComboBox SelectedValue="{Binding PaymentMethod, Mode=TwoWay}" SelectedValuePath="Tag" Style="{StaticResource ModernComboBox}" Height="36" Margin="0,0,0,6">
+                                <ComboBoxItem Tag="CASH" Visibility="{Binding IsReaderMode, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                    <TextBlock Text="Tiền mặt tại quầy" VerticalAlignment="Center" />
+                                </ComboBoxItem>
+                                
+                                <ComboBoxItem Tag="BANK_TRANSFER">
+                                    <TextBlock Text="Quét mã VietQR" VerticalAlignment="Center" />
+                                </ComboBoxItem>
+                                
+                                <ComboBoxItem Tag="DEDUCT_DEPOSIT" IsEnabled="{Binding CanDeductFromDeposit}">
+                                    <TextBlock Text="Trừ vào tiền cọc hiện có" VerticalAlignment="Center" />
+                                </ComboBoxItem>
+                            </ComboBox>
+
+                            <TextBlock Text="{Binding DeductDepositHint}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="2,0,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Ghi chú (tùy chọn):" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                    <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" Tag="Nhập ghi chú gia hạn nếu có..." Height="48" AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top" Padding="10,8" />
                 </StackPanel>
-            </Button>
-            <Button Style="{StaticResource PrimaryGradientButton}" Width="200" Height="38" Command="{Binding ConfirmRenewCommand}" IsDefault="True">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <iconPacks:PackIconMaterial Kind="CheckCircleOutline" Width="15" Height="15" VerticalAlignment="Center" Margin="0,0,6,0" />
-                    <TextBlock Text="Tiến Hành Gia Hạn" VerticalAlignment="Center" />
+            </ScrollViewer>
+
+            <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0" CornerRadius="0,0,15,15" Padding="20,12">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Đóng" Click="BtnCancel_Click" Style="{StaticResource OutlineButton}" Height="36" Width="90" Margin="0,0,10,0" IsCancel="True"/>
+                    <Button Command="{Binding ConfirmRenewCommand}" Style="{StaticResource PrimaryGradientButton}" Height="36" Padding="18,0" IsDefault="True">
+                        <TextBlock Text="Xác nhận gia hạn" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </Button>
                 </StackPanel>
-            </Button>
-        </StackPanel>
-    </Grid>
+            </Border>
+        </Grid>
+    </Border>
 </Window>
