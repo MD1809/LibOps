@@ -18,10 +18,6 @@ namespace LibOps.PresentationLayer.Views
         public CreateSelfServiceRequestDialog(string currentPhone = "", string currentEmail = "", string currentAddress = "")
         {
             InitializeComponent();
-
-            txtNewPhone.Text = currentPhone ?? string.Empty;
-            txtNewEmail.Text = currentEmail ?? string.Empty;
-            txtNewAddress.Text = currentAddress ?? string.Empty;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
