@@ -4,7 +4,7 @@
                     xmlns:helpers="clr-namespace:LibOps.PresentationLayer.Helpers"
                     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks">
 
-    <!-- 0. SYSTEM CONVERTERS -->
+    <!-- BỘ CHUYỂN ĐỔI DỮ LIỆU - Chuyển đổi trạng thái boolean, màu sắc, ảnh bìa cho hiển thị XAML -->
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
     <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
@@ -18,7 +18,7 @@
     <conv:CoverImageSourceConverter x:Key="CoverImageSourceConverter" />
     <conv:CoverImageSourceConverter x:Key="CoverImageConverter" />
 
-    <!-- 1. COLOR PALETTE  -->
+    <!-- BẢNG MÃ MÀU VÀ CỌ VẼ HỆ THỐNG - Bảng màu hex chuẩn dùng chung toàn hệ thống -->
     <Color x:Key="BrandIndigoColor">#4F46E5</Color>
     <Color x:Key="BrandPinkColor">#EC4899</Color>
     <Color x:Key="BrandIndigoDarkColor">#3730A3</Color>
@@ -40,7 +40,7 @@
     <Color x:Key="SurfaceColor">#F8FAFC</Color>
     <Color x:Key="CardWhiteColor">#FFFFFF</Color>
 
-    <!-- Standard & Alias Brushes -->
+    <!-- Cọ vẽ màu đơn - Tô màu chữ, viền và nền cho các control -->
     <SolidColorBrush x:Key="BrandIndigoBrush" Color="{StaticResource BrandIndigoColor}" />
     <SolidColorBrush x:Key="BrandIndigoDarkBrush" Color="{StaticResource BrandIndigoDarkColor}" />
     <SolidColorBrush x:Key="BrandIndigoLightBrush" Color="{StaticResource BrandIndigoLightColor}" />
@@ -62,28 +62,29 @@
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
     <SolidColorBrush x:Key="CardWhiteBrush" Color="{StaticResource CardWhiteColor}" />
 
-    <!-- Primary Action Gradient: Indigo -> Pink -->
+    <!-- Cọ vẽ Gradient chính - Dùng cho nút bấm hành động nổi bật nhất -->
     <LinearGradientBrush x:Key="PrimaryGradientBrush" StartPoint="0,0" EndPoint="1,0">
         <GradientStop Color="#4F46E5" Offset="0.0" />
         <GradientStop Color="#EC4899" Offset="1.0" />
     </LinearGradientBrush>
 
+    <!-- Cọ vẽ Gradient khi rê chuột vào nút chính -->
     <LinearGradientBrush x:Key="PrimaryGradientHoverBrush" StartPoint="0,0" EndPoint="1,0">
         <GradientStop Color="#6366F1" Offset="0.0" />
         <GradientStop Color="#F472B6" Offset="1.0" />
     </LinearGradientBrush>
 
-    <!-- Success Action Gradient: Ocean Blue -->
+    <!-- Cọ vẽ Gradient thao tác thành công -->
     <LinearGradientBrush x:Key="SuccessGradientBrush" StartPoint="0,0" EndPoint="1,0">
         <GradientStop Color="#0284C7" Offset="0.0" />
         <GradientStop Color="#0369A1" Offset="1.0" />
     </LinearGradientBrush>
 
-    <!-- 2. DROP SHADOW EFFECTS -->
+    <!-- HIỆU ỨNG ĐỔ BÓNG -->
     <DropShadowEffect x:Key="CardShadow" BlurRadius="12" Direction="270" ShadowDepth="2" Opacity="0.06" Color="#0F172A" />
     <DropShadowEffect x:Key="FloatingShadow" BlurRadius="20" Direction="270" ShadowDepth="4" Opacity="0.12" Color="#0F172A" />
 
-    <!-- 3. CONTAINER CARDS -->
+    <!-- KHUNG CHỨA NỘI DUNG & THẺ TỔNG QUAN - Khung viền Border bo góc, nền trắng đổ bóng -->
     <Style x:Key="ModernCard" TargetType="Border">
         <Setter Property="Background" Value="White" />
         <Setter Property="CornerRadius" Value="8" />
@@ -93,8 +94,17 @@
         <Setter Property="Effect" Value="{StaticResource CardShadow}" />
     </Style>
 
-    <!-- 4. BUTTON STYLES -->
-    <!-- Primary Gradient Button -->
+    <!-- KpiCard: Khung thẻ số liệu thống kê (KPI) mini ở đầu trang báo cáo, tổng quan -->
+    <Style x:Key="KpiCard" TargetType="Border">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16,14" />
+        <Setter Property="Effect" Value="{StaticResource CardShadow}" />
+    </Style>
+
+    <!-- CÁC KIỂU NÚT BẤM -->
     <Style x:Key="PrimaryGradientButton" TargetType="Button">
         <Setter Property="Background" Value="{StaticResource PrimaryGradientBrush}" />
         <Setter Property="Foreground" Value="White" />
@@ -128,7 +138,7 @@
         </Setter>
     </Style>
 
-    <!-- Success Button (Ocean Blue) -->
+    <!-- Nút thao tác thành công -->
     <Style x:Key="SuccessButton" TargetType="Button">
         <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
         <Setter Property="Foreground" Value="White" />
@@ -161,7 +171,7 @@
         </Setter>
     </Style>
 
-    <!-- Danger Button (Crimson Red) -->
+    <!-- Nút thao tác cảnh báo / nguy hiểm -->
     <Style x:Key="DangerButton" TargetType="Button">
         <Setter Property="Background" Value="{StaticResource ErrorBrush}" />
         <Setter Property="Foreground" Value="White" />
@@ -191,7 +201,7 @@
         </Setter>
     </Style>
 
-    <!-- Outline Button -->
+    <!-- Nút phụ viền mảnh trong suốt -->
     <Style x:Key="OutlineButton" TargetType="Button">
         <Setter Property="Background" Value="White" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -220,7 +230,7 @@
         </Setter>
     </Style>
 
-    <!-- Sidebar Menu Button -->
+    <!-- Nút menu điều hướng thanh bên trái -->
     <Style x:Key="SidebarNavButton" TargetType="RadioButton">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="#94A3B8" />
@@ -251,7 +261,8 @@
         </Setter>
     </Style>
 
-    <!-- 5. TEXTBOX & PASSWORDBOX STYLES -->
+    <!-- Ô NHẬP LIỆU VÀ ĐIỀU KHIỂN NHẬP -->
+    <!-- KHUNG NHẬP VĂN BẢN -->
     <Style x:Key="ModernTextBox" TargetType="TextBox">
         <Setter Property="Background" Value="White" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -315,7 +326,7 @@
 
     <Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}" />
 
-    <!-- 5.1 MODERN TOGGLE SWITCH STYLES -->
+    <!-- 5.2. CÔNG TẮC GẠT BẬT/TẮT - Khung công tắc trượt cho CheckBox -->
     <Style x:Key="ModernToggleSwitch" TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="FontFamily" Value="Segoe UI" />
@@ -414,7 +425,7 @@
         </Setter>
     </Style>
 
-    <!-- Password Show/Hide Eye ToggleButton Style -->
+    <!-- KHUNG NHẬP MẬT KHẨU -->
     <Style x:Key="PasswordEyeToggleButtonStyle" TargetType="ToggleButton">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
@@ -455,6 +466,7 @@
         </Setter>
     </Style>
 
+    <!-- KHUNG NHẬP MẬT KHẨU -->
     <Style x:Key="ModernPasswordBox" TargetType="PasswordBox">
         <Setter Property="Background" Value="White" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -535,7 +547,7 @@
         </Setter>
     </Style>
 
-    <!-- Modern ComboBox ToggleButton -->
+    <!-- DANH SÁCH CHỌN THẢ XUỐNG -->
     <ControlTemplate x:Key="ModernComboBoxToggleButton" TargetType="ToggleButton">
         <Border x:Name="templateRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" SnapsToDevicePixels="true">
             <Border x:Name="splitBorder" Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}" Margin="0" HorizontalAlignment="Right" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" SnapsToDevicePixels="true">
@@ -559,7 +571,7 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <!-- Modern ComboBoxItem Style -->
+    <!-- Định dạng từng dòng mục chọn khi mở danh sách thả xuống -->
     <Style x:Key="ModernComboBoxItem" TargetType="ComboBoxItem">
         <Setter Property="Padding" Value="10,8" />
         <Setter Property="FontFamily" Value="Segoe UI" />
@@ -587,7 +599,7 @@
         </Setter>
     </Style>
 
-    <!-- Modern ComboBox Editable TextBox Style (Loại bỏ viền lồng nhau bên trong) -->
+    <!-- Khung nhập văn bản bên trong khi ComboBox cho phép gõ tìm kiếm -->
     <Style x:Key="ModernComboBoxEditableTextBox" TargetType="TextBox">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="AllowDrop" Value="True" />
@@ -613,7 +625,7 @@
         </Setter>
     </Style>
 
-    <!-- Modern ComboBox Style -->
+    <!-- Khung ComboBox chuẩn dùng cho toàn bộ hệ thống -->
     <Style x:Key="ModernComboBox" TargetType="ComboBox">
         <Setter Property="Background" Value="White" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -702,8 +714,7 @@
 
     <Style TargetType="ComboBox" BasedOn="{StaticResource ModernComboBox}" />
 
-    <!-- 5.4. MODERN DATEPICKER STYLE -->
-    <!-- Modern DatePicker DropDown Button -->
+    <!-- Ô CHỌN NGÀY THÁNG -->
     <Style x:Key="ModernDatePickerDropDownButton" TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
@@ -732,7 +743,7 @@
         </Setter>
     </Style>
 
-    <!-- Modern DatePicker TextBox -->
+    <!-- Ô hiển thị chuỗi ngày tháng đã chọn -->
     <Style x:Key="ModernDatePickerTextBox" TargetType="DatePickerTextBox">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -744,7 +755,7 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>
 
-    <!-- Modern DatePicker (Default & Named) -->
+    <!-- Khung chọn ngày tháng hoàn chỉnh -->
     <Style TargetType="DatePicker">
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="Background" Value="White" />
@@ -805,7 +816,7 @@
 
     <Style x:Key="ModernDatePicker" TargetType="DatePicker" BasedOn="{StaticResource {x:Type DatePicker}}" />
 
-    <!-- 5.5. MODERN SLEEK SLIM SCROLLBAR STYLE -->
+    <!-- THANH CUỘN HIỆN ĐẠI -->
     <Style x:Key="ModernScrollBarThumb" TargetType="{x:Type Thumb}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="IsTabStop" Value="False" />
@@ -871,7 +882,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- 6. MODERN DATAGRID STYLE -->
+    <!-- BẢNG DỮ LIỆU CHÍNH -->
     <Style x:Key="ModernDataGrid" TargetType="DataGrid">
         <Setter Property="Background" Value="White" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}" />
@@ -994,7 +1005,7 @@
 
     <Style TargetType="DataGrid" BasedOn="{StaticResource ModernDataGrid}" />
 
-    <!-- DataGrid Column Header -->
+    <!-- Khung tiêu đề cột bảng dữ liệu -->
     <Style TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{StaticResource BrandIndigoBrush}" />
         <Setter Property="Foreground" Value="White" />
@@ -1008,7 +1019,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
-    <!-- DataGrid Cell Style: Loại bỏ hoàn toàn viền đen, viền ô khi click và kế thừa nền của dòng -->
+    <!-- Khung từng ô dữ liệu -->
     <Style TargetType="DataGridCell">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -1046,7 +1057,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- DataGrid Row Style: Màu nền chọn dịu nhẹ pastel, không viền focus -->
+    <!-- Khung từng dòng dữ liệu -->
     <Style TargetType="DataGridRow">
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -1060,6 +1071,30 @@
                 <Setter Property="FontWeight" Value="SemiBold" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <!-- ĐỊNH DẠNG CĂN LỀ CỘT & Ô BẢNG DỮ LIỆU -->
+    <!-- Căn giữa nội dung ô TextBlock -->
+    <Style x:Key="CenterAlignedCell" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Căn phải nội dung ô TextBlock -->
+    <Style x:Key="RightAlignedCell" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,0,8,0" />
+    </Style>
+
+    <!-- Căn giữa tiêu đề cột -->
+    <Style x:Key="CenterHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- Căn trái tiêu đề cột -->
+    <Style x:Key="LeftHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
     </Style>
 
 </ResourceDictionary>

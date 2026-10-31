@@ -11,19 +11,7 @@
              d:DataContext="{d:DesignInstance vm:ReaderFinanceViewModel}"
              FontFamily="Segoe UI">
 
-    <UserControl.Resources>
-        <!-- Style căn lề ô DataGrid -->
-        <Style x:Key="CenterAlignedCell" TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
 
-        <Style x:Key="RightAlignedCell" TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="0,0,8,0"/>
-        </Style>
-    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
