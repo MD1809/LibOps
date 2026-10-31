@@ -50,6 +50,7 @@ namespace LibOps.PresentationLayer.ViewModels
 
         public string UserDisplayName => CurrentSession?.FullName ?? "Quản Trị Viên";
         public string UserRoleName => CurrentSession?.RoleName ?? "ADMIN";
+        public bool IsAdmin => CurrentSession?.IsAdmin ?? false;
         public string SystemTimeDisplay => DateTime.Now.ToString("dd/MM/yyyy - HH:mm");
 
         // Commands điều hướng & tiện ích
@@ -89,8 +90,8 @@ namespace LibOps.PresentationLayer.ViewModels
             NavigateReturnCommand = new RelayCommand(() => NavigateTo("Return", new ReturnBookProcessViewModel()));
             NavigateBorrowSlipsCommand = new RelayCommand(() => NavigateTo("BorrowSlips", new BorrowSlipListViewModel()));
             NavigateReportsCommand = new RelayCommand(() => NavigateTo("Reports", new ReportAnalyticsViewModel()));
-            NavigateUsersCommand = new RelayCommand(() => NavigateTo("Users", new StaffManagementViewModel()));
-            NavigateSettingsCommand = new RelayCommand(() => NavigateTo("Settings", new SystemSettingsViewModel()));
+            NavigateUsersCommand = new RelayCommand(() => NavigateTo("Users", new StaffManagementViewModel()), () => IsAdmin);
+            NavigateSettingsCommand = new RelayCommand(() => NavigateTo("Settings", new SystemSettingsViewModel()), () => IsAdmin);
             NavigateReaderRequestsCommand = new RelayCommand(() => NavigateTo("ReaderRequests", new ReaderRequestListViewModel()));
             ChangePasswordCommand = new RelayCommand(ExecuteChangePassword);
             LogoutCommand = new RelayCommand(ExecuteLogout);
