@@ -71,11 +71,11 @@
                     <DataGridTemplateColumn Header="Tình Trạng Sách" Width="195">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <ComboBox SelectedValue="{Binding ConditionDisplay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                <ComboBox SelectedValue="{Binding ConditionType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           SelectedValuePath="Tag" Height="30" VerticalContentAlignment="Center">
-                                    <ComboBoxItem Content="Nguyên vẹn (0 đ)" Tag="Nguyên vẹn (0 đ)" />
-                                    <ComboBoxItem Content="Hư hỏng nhẹ (50%)" Tag="Hư hỏng nhẹ (50%)" />
-                                    <ComboBoxItem Content="Làm mất sách (200%)" Tag="Làm mất sách (200%)" />
+                                    <ComboBoxItem Content="{Binding DataContext.NormalConditionLabel, RelativeSource={RelativeSource AncestorType=DataGrid}}" Tag="AVAILABLE" />
+                                    <ComboBoxItem Content="{Binding DataContext.DamagedConditionLabel, RelativeSource={RelativeSource AncestorType=DataGrid}}" Tag="DAMAGED" />
+                                    <ComboBoxItem Content="{Binding DataContext.LostConditionLabel, RelativeSource={RelativeSource AncestorType=DataGrid}}" Tag="LOST" />
                                 </ComboBox>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

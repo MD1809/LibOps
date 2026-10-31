@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -49,6 +49,12 @@ namespace LibOps.PresentationLayer.ViewModels
             get => _grandTotalFine;
             set => SetProperty(ref _grandTotalFine, value);
         }
+
+        public decimal DamagedRatePercent => _fineService.GetDamagedBookFineRate() * 100.0m;
+        public decimal LostRatePercent => _fineService.GetLostBookFineRate() * 100.0m;
+        public string NormalConditionLabel => "Nguyên vẹn (0 đ)";
+        public string DamagedConditionLabel => $"Hư hỏng nhẹ ({DamagedRatePercent:0.#}%)";
+        public string LostConditionLabel => $"Làm mất sách ({LostRatePercent:0.#}%)";
 
         public bool IsCashSelected
         {
@@ -158,6 +164,8 @@ namespace LibOps.PresentationLayer.ViewModels
                 DueDate = lookup.DueDate,
                 OverdueDays = lookup.OverdueDays,
                 OverdueFine = lookup.OverdueFine,
+                DamagedRate = _fineService.GetDamagedBookFineRate(),
+                LostRate = _fineService.GetLostBookFineRate(),
                 ConditionType = "AVAILABLE",
                 ConditionFine = 0,
                 ConditionNote = "Nguyên vẹn"
@@ -183,19 +191,8 @@ namespace LibOps.PresentationLayer.ViewModels
                 }
 
                 string conditionType = dialogVm.SelectedCondition ?? "AVAILABLE";
-                decimal conditionFine = 0;
-                string conditionNote = "Nguyên vẹn";
-
-                if (conditionType == "LOST")
-                {
-                    conditionFine = book.BookPrice * 2.0m;
-                    conditionNote = "Làm mất sách";
-                }
-                else if (conditionType == "DAMAGED")
-                {
-                    conditionFine = book.BookPrice * 0.5m;
-                    conditionNote = "Hư hỏng";
-                }
+                _fineService.CalculateReturnFines(book, conditionType, out decimal conditionFine, out _);
+                string conditionNote = conditionType == "LOST" ? "Làm mất sách" : (conditionType == "DAMAGED" ? "Hư hỏng" : "Nguyên vẹn");
 
                 var item = new BulkReturnItemDto
                 {
@@ -217,6 +214,8 @@ namespace LibOps.PresentationLayer.ViewModels
                     DueDate = book.DueDate,
                     OverdueDays = book.OverdueDays,
                     OverdueFine = book.OverdueFine,
+                    DamagedRate = _fineService.GetDamagedBookFineRate(),
+                    LostRate = _fineService.GetLostBookFineRate(),
                     ConditionType = conditionType,
                     ConditionFine = conditionFine,
                     ConditionNote = conditionNote

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using LibOps.DataAccessLayer.DataRepositories;
 using LibOps.DataAccessLayer.DatabaseTransactions;
@@ -52,6 +52,9 @@ namespace LibOps.BusinessLogicLayer.BusinessServices
             _bookRepo = bookRepo;
             _configService = new SystemSettingsService();
         }
+
+        public virtual decimal GetDamagedBookFineRate() => _configService.GetDamagedBookFineRate();
+        public virtual decimal GetLostBookFineRate() => _configService.GetLostBookFineRate();
 
         /// <summary>
         /// Tra cứu thông tin lượt mượn gốc khi quét mã vạch cuốn sách cần trả

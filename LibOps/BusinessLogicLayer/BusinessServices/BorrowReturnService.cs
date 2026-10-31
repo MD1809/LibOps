@@ -25,6 +25,9 @@ namespace LibOps.BusinessLogicLayer.BusinessServices
         public const int MAX_BOOKS_PER_MEMBER = 5;
         public const int DEFAULT_BORROW_DAYS = 14;
 
+        public virtual int GetMaxBooksPerMember() => _configService.GetMaxBooksPerMember();
+        public virtual int GetMaxBorrowDays() => _configService.GetMaxBorrowDays();
+
         public BorrowReturnService()
         {
             _slipRepo = new BorrowSlipRepository();
@@ -134,10 +137,11 @@ namespace LibOps.BusinessLogicLayer.BusinessServices
             }
 
             // Điều kiện 4: Hạn mức số lượng sách
-            if (currentBorrowCount + newItemsCount > MAX_BOOKS_PER_MEMBER)
+            int maxBooks = GetMaxBooksPerMember();
+            if (currentBorrowCount + newItemsCount > maxBooks)
             {
-                int remainingAllowed = Math.Max(0, MAX_BOOKS_PER_MEMBER - currentBorrowCount);
-                errorMessage = $"Độc giả đang mượn {currentBorrowCount} cuốn. Chỉ được phép mượn thêm tối đa {remainingAllowed} cuốn (Hạn mức: {MAX_BOOKS_PER_MEMBER} cuốn/người)!";
+                int remainingAllowed = Math.Max(0, maxBooks - currentBorrowCount);
+                errorMessage = $"Độc giả đang mượn {currentBorrowCount} cuốn. Chỉ được phép mượn thêm tối đa {remainingAllowed} cuốn (Hạn mức: {maxBooks} cuốn/người)!";
                 return false;
             }
 
@@ -242,9 +246,10 @@ namespace LibOps.BusinessLogicLayer.BusinessServices
                 return false;
             }
 
-            if (items.Count > MAX_BOOKS_PER_MEMBER)
+            int maxBooks = GetMaxBooksPerMember();
+            if (items.Count > maxBooks)
             {
-                errorMessage = $"Số lượng sách vượt quá hạn mức cho phép (Tối đa {MAX_BOOKS_PER_MEMBER} cuốn).";
+                errorMessage = $"Số lượng sách vượt quá hạn mức cho phép (Tối đa {maxBooks} cuốn).";
                 return false;
             }
 

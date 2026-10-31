@@ -36,6 +36,9 @@ namespace LibOps.DataModels.DataTransferObjects
         private decimal _conditionFine = 0;
         private string _conditionNote = string.Empty;
 
+        public decimal DamagedRate { get; set; } = 0.5m;
+        public decimal LostRate { get; set; } = 2.0m;
+
         public event Action ConditionChanged;
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -55,10 +58,34 @@ namespace LibOps.DataModels.DataTransferObjects
                 if (_conditionType != value)
                 {
                     _conditionType = value;
+                    ApplyConditionFine();
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(ConditionType));
+                    OnPropertyChanged(nameof(ConditionFine));
+                    OnPropertyChanged(nameof(ConditionNote));
                     OnPropertyChanged(nameof(ConditionDisplay));
                     OnPropertyChanged(nameof(TotalFine));
+                    ConditionChanged?.Invoke();
                 }
+            }
+        }
+
+        public void ApplyConditionFine()
+        {
+            if (_conditionType == "DAMAGED")
+            {
+                _conditionFine = Math.Round(BookPrice * DamagedRate, 0);
+                _conditionNote = "Hư hỏng";
+            }
+            else if (_conditionType == "LOST")
+            {
+                _conditionFine = Math.Round(BookPrice * LostRate, 0);
+                _conditionNote = "Làm mất sách";
+            }
+            else
+            {
+                _conditionFine = 0;
+                _conditionNote = "Nguyên vẹn";
             }
         }
 
@@ -102,32 +129,24 @@ namespace LibOps.DataModels.DataTransferObjects
         {
             get
             {
-                if (_conditionType == "DAMAGED") return "Hư hỏng nhẹ (50%)";
-                if (_conditionType == "LOST") return "Làm mất sách (200%)";
+                if (_conditionType == "DAMAGED") return $"Hư hỏng nhẹ ({DamagedRate * 100:0.#}%)";
+                if (_conditionType == "LOST") return $"Làm mất sách ({LostRate * 100:0.#}%)";
                 return "Nguyên vẹn (0 đ)";
             }
             set
             {
-                if (value != null && value.Contains("Hư hỏng"))
+                if (value != null && (value.Contains("Hư hỏng") || value.Contains("DAMAGED")))
                 {
-                    _conditionType = "DAMAGED";
-                    _conditionFine = BookPrice * 0.5m;
+                    ConditionType = "DAMAGED";
                 }
-                else if (value != null && value.Contains("mất"))
+                else if (value != null && (value.Contains("mất") || value.Contains("LOST")))
                 {
-                    _conditionType = "LOST";
-                    _conditionFine = BookPrice * 2.0m;
+                    ConditionType = "LOST";
                 }
                 else
                 {
-                    _conditionType = "AVAILABLE";
-                    _conditionFine = 0;
+                    ConditionType = "AVAILABLE";
                 }
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(ConditionType));
-                OnPropertyChanged(nameof(ConditionFine));
-                OnPropertyChanged(nameof(TotalFine));
-                ConditionChanged?.Invoke();
             }
         }
 

@@ -139,7 +139,7 @@
                     </StackPanel>
                 </Button>
 
-                <TextBlock Grid.Column="3" Text="Hạn mức: Tối đa 3 cuốn/độc giả | Thời hạn mượn: 14 ngày" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12.5" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="3" Text="{Binding BorrowLimitNoteDisplay}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12.5" VerticalAlignment="Center" HorizontalAlignment="Right" />
             </Grid>
         </Border>
 

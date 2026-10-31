@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -116,6 +116,10 @@ namespace LibOps.PresentationLayer.ViewModels
             set => SetProperty(ref _eligibilityReason, value);
         }
 
+        public int MaxBooksPerMember => _borrowService.GetMaxBooksPerMember();
+        public int MaxBorrowDays => _borrowService.GetMaxBorrowDays();
+        public string BorrowLimitNoteDisplay => $"Hạn mức: Tối đa {MaxBooksPerMember} cuốn/độc giả | Thời hạn mượn: {MaxBorrowDays} ngày";
+
         public ICommand CheckMemberCommand { get; }
         public ICommand AddBookCommand { get; }
         public ICommand RemoveItemCommand { get; }
@@ -172,9 +176,10 @@ namespace LibOps.PresentationLayer.ViewModels
                 return;
             }
 
-            if (CartItems.Count + CurrentBorrowCount >= 3)
+            int maxBooks = MaxBooksPerMember;
+            if (CartItems.Count + CurrentBorrowCount >= maxBooks)
             {
-                ShowMessageRequested?.Invoke("Độc giả đã đạt hạn mức mượn tối đa 3 cuốn!");
+                ShowMessageRequested?.Invoke($"Độc giả đã đạt hạn mức mượn tối đa {maxBooks} cuốn!");
                 return;
             }
 
@@ -207,8 +212,9 @@ namespace LibOps.PresentationLayer.ViewModels
             if (CurrentMember == null || CartItems.Count == 0) return;
 
             int userId = AuthService.CurrentSession?.UserId ?? 1;
+            int maxDays = MaxBorrowDays;
             DateTime borrowDate = DateTime.Now;
-            DateTime dueDate = DateTime.Today.AddDays(BorrowReturnService.DEFAULT_BORROW_DAYS);
+            DateTime dueDate = DateTime.Today.AddDays(maxDays);
 
             bool ok = _borrowService.CreateBorrowSlip(
                 CurrentMember.MemberId,
