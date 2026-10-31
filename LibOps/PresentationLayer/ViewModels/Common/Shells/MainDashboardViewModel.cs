@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 using LibOps.BusinessLogicLayer.BusinessServices;
 using LibOps.DataModels.DataTransferObjects;
@@ -60,7 +60,6 @@ namespace LibOps.PresentationLayer.ViewModels
         public ICommand NavigateCategoriesCommand { get; }
         public ICommand NavigateAuthorsCommand { get; }
         public ICommand NavigatePublishersCommand { get; }
-        public ICommand NavigateMetadataCommand { get; }
         public ICommand NavigateMembersCommand { get; }
         public ICommand NavigateBorrowCommand { get; }
         public ICommand NavigateReturnCommand { get; }
@@ -85,7 +84,6 @@ namespace LibOps.PresentationLayer.ViewModels
             NavigateCategoriesCommand = new RelayCommand(() => NavigateTo("Categories", new CategoryManagementViewModel()));
             NavigateAuthorsCommand = new RelayCommand(() => NavigateTo("Authors", new AuthorManagementViewModel()));
             NavigatePublishersCommand = new RelayCommand(() => NavigateTo("Publishers", new PublisherManagementViewModel()));
-            NavigateMetadataCommand = new RelayCommand(() => NavigateTo("Categories", new CategoryManagementViewModel()));
             NavigateMembersCommand = new RelayCommand(() => NavigateTo("Members", new MemberListViewModel()));
             NavigateBorrowCommand = new RelayCommand(() => NavigateTo("Borrow", new CreateBorrowSlipViewModel()));
             NavigateReturnCommand = new RelayCommand(() => NavigateTo("Return", new ReturnBookProcessViewModel()));
