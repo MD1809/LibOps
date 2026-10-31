@@ -19,14 +19,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" CornerRadius="15,15,0,0" Padding="20,16">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#0F172A" Offset="0.0"/>
-                        <GradientStop Color="#312E81" Offset="0.5"/>
-                        <GradientStop Color="#4F46E5" Offset="1.0"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+            <Border Grid.Row="0" Background="{StaticResource PrimaryDarkBrush}" CornerRadius="15,15,0,0" Padding="20,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

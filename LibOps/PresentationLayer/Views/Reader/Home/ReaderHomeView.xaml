@@ -54,18 +54,11 @@
         <StackPanel>
 
             <!-- 1. HERO BANNER  -->
-            <Border CornerRadius="12" Margin="0,0,0,22" Padding="28,24" Effect="{StaticResource FloatingShadow}">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#0F172A" Offset="0.0"/>
-                        <GradientStop Color="#1E1B4B" Offset="0.5"/>
-                        <GradientStop Color="#312E81" Offset="1.0"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+            <Border Background="{StaticResource PrimaryDarkBrush}" CornerRadius="12" Margin="0,0,0,22" Padding="28,24" Effect="{StaticResource FloatingShadow}">
                 <!-- Tiêu đề & Slogan -->
                 <StackPanel VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                        <TextBlock Text="CỔNG KHÁM PHÁ TRI THỨC VÀ TÀI LIỆU SỐ" FontSize="12" FontWeight="Bold" Foreground="{StaticResource BrandPinkBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="CỔNG KHÁM PHÁ TRI THỨC VÀ TÀI LIỆU SỐ" FontSize="12" FontWeight="Bold" Foreground="{StaticResource BrandIndigoLightBrush}" VerticalAlignment="Center"/>
                     </StackPanel>
                     <TextBlock Text="Học tập không giới hạn, vươn tầm tri thức" FontSize="22" FontWeight="ExtraBold" Foreground="#FFFFFF"/>
                     <TextBlock Text="Khám phá các tựa sách nổi bật được mượn nhiều nhất và những ấn phẩm mới nhất vừa nhập kho tại thư viện LibOps." 

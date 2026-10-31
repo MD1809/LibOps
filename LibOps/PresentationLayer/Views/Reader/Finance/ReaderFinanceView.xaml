@@ -51,14 +51,7 @@
                 <StackPanel>
                     
                     <!-- THẺ THƯ VIỆN GRAPHIC DESIGN -->
-                    <Border CornerRadius="16" Padding="22,20" Margin="0,0,0,16" Effect="{StaticResource FloatingShadow}">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#0F172A" Offset="0.0"/>
-                                <GradientStop Color="#1E293B" Offset="0.5"/>
-                                <GradientStop Color="#312E81" Offset="1.0"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
+                    <Border Background="{StaticResource SlateDarkBrush}" CornerRadius="16" Padding="22,20" Margin="0,0,0,16" Effect="{StaticResource FloatingShadow}">
                         
                         <Grid MinHeight="175">
                             <Grid.RowDefinitions>

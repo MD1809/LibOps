@@ -19,15 +19,8 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- 1. Header Gradient -->
-            <Border Grid.Row="0" CornerRadius="15,15,0,0" Padding="20,16">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#0F172A" Offset="0.0"/>
-                        <GradientStop Color="#1E293B" Offset="0.5"/>
-                        <GradientStop Color="#3B82F6" Offset="1.0"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+            <!-- 1. Header Màu Đơn -->
+            <Border Grid.Row="0" Background="{StaticResource PrimaryDarkBrush}" CornerRadius="15,15,0,0" Padding="20,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

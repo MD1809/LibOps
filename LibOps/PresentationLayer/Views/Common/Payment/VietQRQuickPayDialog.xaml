@@ -1,4 +1,4 @@
-﻿<Window x:Class="LibOps.PresentationLayer.Views.Payment.VietQRQuickPayDialog"
+<Window x:Class="LibOps.PresentationLayer.Views.Payment.VietQRQuickPayDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
@@ -19,15 +19,8 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- 1. Header Gradient Xanh VietQR -->
-            <Border Grid.Row="0" CornerRadius="15,15,0,0" Padding="20,16">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#0F172A" Offset="0.0"/>
-                        <GradientStop Color="#1E3A8A" Offset="0.5"/>
-                        <GradientStop Color="#0284C7" Offset="1.0"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+            <!-- 1. Header Màu Đơn VietQR -->
+            <Border Grid.Row="0" Background="{StaticResource PrimaryDarkBrush}" CornerRadius="15,15,0,0" Padding="20,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

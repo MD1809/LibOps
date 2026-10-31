@@ -18,11 +18,11 @@
     <conv:CoverImageSourceConverter x:Key="CoverImageSourceConverter" />
     <conv:CoverImageSourceConverter x:Key="CoverImageConverter" />
 
-    <!-- BẢNG MÃ MÀU VÀ CỌ VẼ HỆ THỐNG - Bảng màu hex chuẩn dùng chung toàn hệ thống -->
-    <Color x:Key="BrandIndigoColor">#4F46E5</Color>
-    <Color x:Key="BrandPinkColor">#EC4899</Color>
-    <Color x:Key="BrandIndigoDarkColor">#3730A3</Color>
-    <Color x:Key="BrandIndigoLightColor">#6366F1</Color>
+    <!-- BẢNG MÃ MÀU VÀ CỌ VẼ HỆ THỐNG - Bảng màu Corporate Blue chuẩn dùng chung toàn hệ thống -->
+    <Color x:Key="BrandIndigoColor">#2563EB</Color>
+    <Color x:Key="BrandPinkColor">#1D4ED8</Color>
+    <Color x:Key="BrandIndigoDarkColor">#1D4ED8</Color>
+    <Color x:Key="BrandIndigoLightColor">#3B82F6</Color>
     <Color x:Key="SuccessColor">#0284C7</Color>
     <Color x:Key="SuccessDarkColor">#0369A1</Color>
     <Color x:Key="WarningColor">#F59E0B</Color>
@@ -32,7 +32,7 @@
     <Color x:Key="SlateDarkColor">#0F172A</Color>
     <Color x:Key="SlateMenuColor">#1E293B</Color>
     <Color x:Key="SlateMutedColor">#64748B</Color>
-    <Color x:Key="HoverPastelColor">#FCE7F3</Color>
+    <Color x:Key="HoverPastelColor">#EFF6FF</Color>
     <Color x:Key="TextPrimaryColor">#111827</Color>
     <Color x:Key="TextSecondaryColor">#6B7280</Color>
     <Color x:Key="BorderLightColor">#E2E8F0</Color>
@@ -51,6 +51,7 @@
     <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
+    <SolidColorBrush x:Key="ErrorDarkBrush" Color="{StaticResource ErrorDarkColor}" />
     <SolidColorBrush x:Key="SlateDarkBrush" Color="{StaticResource SlateDarkColor}" />
     <SolidColorBrush x:Key="SlateMenuBrush" Color="{StaticResource SlateMenuColor}" />
     <SolidColorBrush x:Key="SlateMutedBrush" Color="{StaticResource SlateMutedColor}" />
@@ -62,23 +63,10 @@
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
     <SolidColorBrush x:Key="CardWhiteBrush" Color="{StaticResource CardWhiteColor}" />
 
-    <!-- Cọ vẽ Gradient chính - Dùng cho nút bấm hành động nổi bật nhất -->
-    <LinearGradientBrush x:Key="PrimaryGradientBrush" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#4F46E5" Offset="0.0" />
-        <GradientStop Color="#EC4899" Offset="1.0" />
-    </LinearGradientBrush>
-
-    <!-- Cọ vẽ Gradient khi rê chuột vào nút chính -->
-    <LinearGradientBrush x:Key="PrimaryGradientHoverBrush" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#6366F1" Offset="0.0" />
-        <GradientStop Color="#F472B6" Offset="1.0" />
-    </LinearGradientBrush>
-
-    <!-- Cọ vẽ Gradient thao tác thành công -->
-    <LinearGradientBrush x:Key="SuccessGradientBrush" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#0284C7" Offset="0.0" />
-        <GradientStop Color="#0369A1" Offset="1.0" />
-    </LinearGradientBrush>
+    <!-- Cọ vẽ màu đơn cho các nút hành động chính -->
+    <SolidColorBrush x:Key="PrimaryGradientBrush" Color="{StaticResource BrandIndigoColor}" />
+    <SolidColorBrush x:Key="PrimaryGradientHoverBrush" Color="{StaticResource BrandIndigoDarkColor}" />
+    <SolidColorBrush x:Key="SuccessGradientBrush" Color="{StaticResource SuccessColor}" />
 
     <!-- HIỆU ỨNG ĐỔ BÓNG -->
     <DropShadowEffect x:Key="CardShadow" BlurRadius="12" Direction="270" ShadowDepth="2" Opacity="0.06" Color="#0F172A" />
@@ -589,7 +577,7 @@
                             <Setter Property="Foreground" Value="{StaticResource BrandIndigoBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="itemBorder" Property="Background" Value="#EEF2FF" />
+                            <Setter TargetName="itemBorder" Property="Background" Value="#DBEAFE" />
                             <Setter Property="Foreground" Value="{StaticResource BrandIndigoBrush}" />
                             <Setter Property="FontWeight" Value="SemiBold" />
                         </Trigger>
@@ -1015,7 +1003,7 @@
         <Setter Property="Height" Value="40" />
         <Setter Property="Padding" Value="12,0" />
         <Setter Property="BorderThickness" Value="0,0,1,0" />
-        <Setter Property="BorderBrush" Value="#6366F1" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrandIndigoLightBrush}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
@@ -1066,7 +1054,7 @@
                 <Setter Property="Background" Value="#F1F5F9" />
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="#E0E7FF" />
+                <Setter Property="Background" Value="#DBEAFE" />
                 <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
                 <Setter Property="FontWeight" Value="SemiBold" />
             </Trigger>

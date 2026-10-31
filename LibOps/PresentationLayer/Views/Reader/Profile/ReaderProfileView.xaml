@@ -49,14 +49,8 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Avatar Gradient với Initials -->
-                    <Border Grid.Column="0" Width="72" Height="72" CornerRadius="36" Effect="{StaticResource CardShadow}" Margin="0,0,20,0">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#4F46E5" Offset="0.0"/>
-                                <GradientStop Color="#7C3AED" Offset="1.0"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
+                    <!-- Avatar màu đơn với Initials -->
+                    <Border Grid.Column="0" Width="72" Height="72" CornerRadius="36" Background="{StaticResource PrimaryBrush}" Effect="{StaticResource CardShadow}" Margin="0,0,20,0">
                         <Grid>
                             <TextBlock Text="{Binding AvatarInitials, FallbackValue='DG'}" 
                                        FontSize="24" FontWeight="Bold" Foreground="#FFFFFF" 
