@@ -6,7 +6,7 @@
         Height="580" Width="520"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Background="Transparent"
+        Background="White"
         FontFamily="Segoe UI">
 
     <Border Background="White" CornerRadius="16" BorderBrush="#CBD5E1" BorderThickness="1" Effect="{StaticResource CardShadow}">
