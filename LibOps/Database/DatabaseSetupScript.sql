@@ -1,7 +1,7 @@
 -- ============================================================================
 -- HỆ THỐNG QUẢN LÝ THƯ VIỆN - LIBOPS
 -- DATABASE SETUP & SEED DATA SCRIPT (MS SQL SERVER)
--- Mô tả: Khởi tạo toàn bộ 16 bảng CSDL, khóa chính, khóa ngoại, chỉ mục và dữ liệu mẫu (>= 5 bản ghi/bảng)
+-- Mô tả: Khởi tạo toàn bộ 17 bảng CSDL, khóa chính, khóa ngoại, chỉ mục và dữ liệu mẫu
 -- ============================================================================
 
 -- 1. Tạo Cơ Sở Dữ Liệu nếu chưa tồn tại
@@ -25,6 +25,7 @@ IF OBJECT_ID(N'dbo.ReturnSlipDetails', N'U') IS NOT NULL DROP TABLE dbo.ReturnSl
 IF OBJECT_ID(N'dbo.BorrowSlipDetails', N'U') IS NOT NULL DROP TABLE dbo.BorrowSlipDetails;
 IF OBJECT_ID(N'dbo.BorrowSlips', N'U') IS NOT NULL DROP TABLE dbo.BorrowSlips;
 IF OBJECT_ID(N'dbo.BookCopies', N'U') IS NOT NULL DROP TABLE dbo.BookCopies;
+IF OBJECT_ID(N'dbo.BookAuthors', N'U') IS NOT NULL DROP TABLE dbo.BookAuthors;
 IF OBJECT_ID(N'dbo.Books', N'U') IS NOT NULL DROP TABLE dbo.Books;
 IF OBJECT_ID(N'dbo.Publishers', N'U') IS NOT NULL DROP TABLE dbo.Publishers;
 IF OBJECT_ID(N'dbo.Authors', N'U') IS NOT NULL DROP TABLE dbo.Authors;
@@ -292,6 +293,16 @@ CREATE TABLE dbo.ServiceFeeReceipts (
 );
 GO
 
+-- 3.17. Bảng Quan Hệ Sách - Nhiều Tác Giả (BookAuthors)
+CREATE TABLE dbo.BookAuthors (
+    BookId INT NOT NULL,
+    AuthorId INT NOT NULL,
+    CONSTRAINT PK_BookAuthors PRIMARY KEY CLUSTERED (BookId, AuthorId),
+    CONSTRAINT FK_BookAuthors_Books FOREIGN KEY (BookId) REFERENCES dbo.Books(BookId) ON DELETE CASCADE,
+    CONSTRAINT FK_BookAuthors_Authors FOREIGN KEY (AuthorId) REFERENCES dbo.Authors(AuthorId) ON DELETE CASCADE
+);
+GO
+
 -- ============================================================================
 -- 4. TẠO CÁC CHỈ MỤC TỐI ƯU HÓA HIỆU NĂNG TRUY VẤN (INDEXES)
 -- ============================================================================
@@ -307,6 +318,10 @@ CREATE NONCLUSTERED INDEX IX_ServiceFeeReceipts_MemberId ON dbo.ServiceFeeReceip
 GO
 
 -- ============================================================================
+-- Dữ liệu hoạt động mẫu trải dài tháng 11/2026; trạng thái được mô tả tại ngày 30/11/2026.
+-- Ngày sinh và năm xuất bản giữ nguyên; hạn trả có thể sang tháng 12 và hạn thẻ sang năm 2027.
+-- Thẻ hết hạn/đã đóng giữ lịch sử cấp thẻ và chứng từ tương ứng từ tháng 11/2025.
+-- Đây là ảnh chụp dữ liệu cuối tháng; ứng dụng vẫn tính hạn theo ngày thực tế của máy.
 -- 5. NẠP DỮ LIỆU NỀN TẢNG BẮT BUỘC (BASELINE SEED DATA)
 -- ============================================================================
 
@@ -318,25 +333,25 @@ INSERT INTO dbo.Roles (RoleName, Description) VALUES
 GO
 
 -- 5.2. Bảng Tham Số Cấu Hình Hệ Thống (SystemSettings) - 18 tham số chuẩn
-INSERT INTO dbo.SystemSettings (SettingKey, SettingValue, Description) VALUES
-(N'CARD_ISSUANCE_FEE', N'50000', N'Phí dịch vụ phát hành thẻ độc giả mới (Không hoàn lại - VNĐ)'),
-(N'MEMBER_CARD_DEFAULT_DEPOSIT', N'200000', N'Mức tiền cọc thế chân tối thiểu để mượn sách (VNĐ)'),
-(N'MAX_BORROW_DAYS', N'14', N'Thời hạn tối đa cho một lượt mượn sách (Ngày)'),
-(N'MAX_BOOKS_PER_MEMBER', N'5', N'Số lượng sách tối đa một độc giả được phép mượn đồng thời (Cuốn)'),
-(N'FINE_PER_OVERDUE_DAY', N'5000', N'Số tiền phạt cho mỗi ngày trễ hạn (VNĐ / ngày / cuốn)'),
-(N'LOST_BOOK_FINE_RATE', N'2.0', N'Hệ số bồi thường khi làm mất sách (200% giá bìa sách)'),
-(N'DAMAGED_BOOK_FINE_RATE', N'0.5', N'Hệ số bồi thường khi làm hư hại sách (50% giá bìa sách)'),
-(N'MEMBER_CARD_VALIDITY_DAYS', N'365', N'Thời hạn hiệu lực của thẻ độc giả kể từ ngày cấp (Ngày)'),
-(N'MAX_RENEWAL_COUNT', N'1', N'Số lần gia hạn tối đa cho một lượt mượn sách (Lần)'),
-(N'RENEWAL_DAYS', N'7', N'Số ngày gia hạn thêm mỗi lần gia hạn (Ngày)'),
-(N'MEMBER_CARD_ANNUAL_FEE', N'50000', N'Phí thường niên khi gia hạn thẻ độc giả (VNĐ/năm)'),
-(N'SMTP_HOST', N'smtp.gmail.com', N'Máy chủ SMTP gửi email thông báo hệ thống'),
-(N'SMTP_PORT', N'587', N'Cổng kết nối máy chủ SMTP (587 TLS/STARTTLS)'),
-(N'SMTP_ENABLE_SSL', N'true', N'Bật mã hóa SSL/TLS an toàn khi gửi email (true/false)'),
-(N'SMTP_USERNAME', N'dung2k5k58lx@gmail.com', N'Tài khoản email hệ thống gửi thư cho độc giả'),
-(N'SMTP_PASSWORD', N'citz voms bvei wuur', N'Mật khẩu ứng dụng của email hệ thống'),
-(N'SMTP_FROM_NAME', N'LibOps - Thư Viện Hiện Đại', N'Tên hiển thị người gửi email'),
-(N'SYSTEM_EMAIL_NOTIFICATION_ENABLED', N'true', N'Công tắc bật/tắt tính năng gửi email tự động toàn hệ thống');
+INSERT INTO dbo.SystemSettings (SettingKey, SettingValue, Description, LastModifiedAt) VALUES
+(N'CARD_ISSUANCE_FEE', N'50000', N'Phí dịch vụ phát hành thẻ độc giả mới (Không hoàn lại - VNĐ)', '2026-11-01T06:00:00'),
+(N'MEMBER_CARD_DEFAULT_DEPOSIT', N'200000', N'Mức tiền cọc thế chân tối thiểu để mượn sách (VNĐ)', '2026-11-01T06:00:00'),
+(N'MAX_BORROW_DAYS', N'14', N'Thời hạn tối đa cho một lượt mượn sách (Ngày)', '2026-11-01T06:00:00'),
+(N'MAX_BOOKS_PER_MEMBER', N'5', N'Số lượng sách tối đa một độc giả được phép mượn đồng thời (Cuốn)', '2026-11-01T06:00:00'),
+(N'FINE_PER_OVERDUE_DAY', N'5000', N'Số tiền phạt cho mỗi ngày trễ hạn (VNĐ / ngày / cuốn)', '2026-11-01T06:00:00'),
+(N'LOST_BOOK_FINE_RATE', N'2.0', N'Hệ số bồi thường khi làm mất sách (200% giá bìa sách)', '2026-11-01T06:00:00'),
+(N'DAMAGED_BOOK_FINE_RATE', N'0.5', N'Hệ số bồi thường khi làm hư hại sách (50% giá bìa sách)', '2026-11-01T06:00:00'),
+(N'MEMBER_CARD_VALIDITY_DAYS', N'365', N'Thời hạn hiệu lực của thẻ độc giả kể từ ngày cấp (Ngày)', '2026-11-01T06:00:00'),
+(N'MAX_RENEWAL_COUNT', N'1', N'Số lần gia hạn tối đa cho một lượt mượn sách (Lần)', '2026-11-01T06:00:00'),
+(N'RENEWAL_DAYS', N'7', N'Số ngày gia hạn thêm mỗi lần gia hạn (Ngày)', '2026-11-01T06:00:00'),
+(N'MEMBER_CARD_ANNUAL_FEE', N'50000', N'Phí thường niên khi gia hạn thẻ độc giả (VNĐ/năm)', '2026-11-01T06:00:00'),
+(N'SMTP_HOST', N'smtp.gmail.com', N'Máy chủ SMTP gửi email thông báo hệ thống', '2026-11-01T06:00:00'),
+(N'SMTP_PORT', N'587', N'Cổng kết nối máy chủ SMTP (587 TLS/STARTTLS)', '2026-11-01T06:00:00'),
+(N'SMTP_ENABLE_SSL', N'true', N'Bật mã hóa SSL/TLS an toàn khi gửi email (true/false)', '2026-11-01T06:00:00'),
+(N'SMTP_USERNAME', N'dung2k5k58lx@gmail.com', N'Tài khoản email hệ thống gửi thư cho độc giả', '2026-11-01T06:00:00'),
+(N'SMTP_PASSWORD', N'citz voms bvei wuur', N'Mật khẩu ứng dụng của email hệ thống', '2026-11-01T06:00:00'),
+(N'SMTP_FROM_NAME', N'LibOps - Thư Viện Hiện Đại', N'Tên hiển thị người gửi email', '2026-11-01T06:00:00'),
+(N'SYSTEM_EMAIL_NOTIFICATION_ENABLED', N'true', N'Công tắc bật/tắt tính năng gửi email tự động toàn hệ thống', '2026-11-01T06:00:00');
 GO
 
 -- 5.3. Bảng Tài Khoản Người Dùng (UserAccounts) - Khởi tạo 2 tài khoản quản trị & nghiệp vụ hệ thống
@@ -348,13 +363,13 @@ DECLARE @LibrarianRoleId INT = (SELECT TOP 1 RoleId FROM dbo.Roles WHERE RoleNam
 IF @AdminRoleId IS NOT NULL
 BEGIN
     INSERT INTO dbo.UserAccounts (Username, PasswordHash, PasswordSalt, FullName, Email, PhoneNumber, RoleId, MemberId, IsActive, CreatedAt)
-    VALUES (N'Admin', N'A303B1934621E50C4D142F63871D1A402852394605022F9C128ECA1E0D58C24D', N'LIB_OPS_SALT_2026', N'Quản Trị Viên Hệ Thống', N'admin@libops.vn', N'0912000111', @AdminRoleId, NULL, 1, GETDATE());
+    VALUES (N'Admin', N'A303B1934621E50C4D142F63871D1A402852394605022F9C128ECA1E0D58C24D', N'LIB_OPS_SALT_2026', N'Quản Trị Viên Hệ Thống', N'admin@libops.vn', N'0912000111', @AdminRoleId, NULL, 1, '2026-11-01T06:00:00');
 END
 
 IF @LibrarianRoleId IS NOT NULL
 BEGIN
     INSERT INTO dbo.UserAccounts (Username, PasswordHash, PasswordSalt, FullName, Email, PhoneNumber, RoleId, MemberId, IsActive, CreatedAt)
-    VALUES (N'Librarian', N'EA0A9503A235699897D0E19C74D5427934651F78E6BED78B4327E844BE6DEBD4', N'LIB_OPS_SALT_2026', N'Thủ Thư Thư Viện', N'librarian@libops.vn', N'0988111222', @LibrarianRoleId, NULL, 1, GETDATE());
+    VALUES (N'Librarian', N'EA0A9503A235699897D0E19C74D5427934651F78E6BED78B4327E844BE6DEBD4', N'LIB_OPS_SALT_2026', N'Thủ Thư Thư Viện', N'librarian@libops.vn', N'0988111222', @LibrarianRoleId, NULL, 1, '2026-11-01T06:00:00');
 END
 GO
 
@@ -494,77 +509,84 @@ VALUES
 (N'978-604-30-9900-1', N'Tư Duy Thiết Kế (Design Thinking) Cho Người Bắt Đầu', 10, 25, 8, 2022, 195000, N'Kệ TK-03', N'Assets/BookCovers/Tư_Duy_Thiết_Kế_Cho_Người_Mới.jpg', N'Quy trình 5 bước giải quyết vấn đề sáng tạo và tạo ra sản phẩm đột phá.', 4, 4);
 GO
 
+-- 6.4a. Khởi tạo liên kết tác giả cho toàn bộ đầu sách mẫu (BookAuthors)
+-- Giữ Books.AuthorId làm tác giả đại diện để tương thích với các truy vấn hiện có.
+INSERT INTO dbo.BookAuthors (BookId, AuthorId)
+SELECT BookId, AuthorId
+FROM dbo.Books;
+GO
+
 -- 6.5. Chèn 100 Bản Sao Sách (BookCopies - 2 cuốn/đầu sách)
 INSERT INTO dbo.BookCopies (BookId, Barcode, Status, ConditionNote, AddedDate) VALUES
 -- Sách CNTT (1 -> 5)
-(1, N'BC-IT-001', N'AVAILABLE', N'Mới 100%', GETDATE()), (1, N'BC-IT-002', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(2, N'BC-IT-003', N'AVAILABLE', N'Mới 100%', GETDATE()), (2, N'BC-IT-004', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(3, N'BC-IT-005', N'AVAILABLE', N'Mới 100%', GETDATE()), (3, N'BC-IT-006', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(4, N'BC-IT-007', N'AVAILABLE', N'Mới 100%', GETDATE()), (4, N'BC-IT-008', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(5, N'BC-IT-009', N'AVAILABLE', N'Mới 100%', GETDATE()), (5, N'BC-IT-010', N'AVAILABLE', N'Mới 100%', GETDATE()),
+(1, N'BC-IT-001', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (1, N'BC-IT-002', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(2, N'BC-IT-003', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (2, N'BC-IT-004', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(3, N'BC-IT-005', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (3, N'BC-IT-006', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(4, N'BC-IT-007', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (4, N'BC-IT-008', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(5, N'BC-IT-009', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (5, N'BC-IT-010', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
 
 -- Sách Kinh tế (6 -> 10)
-(6, N'BC-KT-001', N'AVAILABLE', N'Mới 100%', GETDATE()), (6, N'BC-KT-002', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(7, N'BC-KT-003', N'AVAILABLE', N'Mới 100%', GETDATE()), (7, N'BC-KT-004', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(8, N'BC-KT-005', N'AVAILABLE', N'Mới 100%', GETDATE()), (8, N'BC-KT-006', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(9, N'BC-KT-007', N'AVAILABLE', N'Mới 100%', GETDATE()), (9, N'BC-KT-008', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(10, N'BC-KT-009', N'AVAILABLE', N'Mới 100%', GETDATE()), (10, N'BC-KT-010', N'AVAILABLE', N'Mới 100%', GETDATE()),
+(6, N'BC-KT-001', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (6, N'BC-KT-002', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(7, N'BC-KT-003', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (7, N'BC-KT-004', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(8, N'BC-KT-005', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (8, N'BC-KT-006', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(9, N'BC-KT-007', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (9, N'BC-KT-008', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(10, N'BC-KT-009', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (10, N'BC-KT-010', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
 
 -- Sách Tâm lý (11 -> 15)
-(11, N'BC-TL-001', N'AVAILABLE', N'Mới 100%', GETDATE()), (11, N'BC-TL-002', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(12, N'BC-TL-003', N'AVAILABLE', N'Mới 100%', GETDATE()), (12, N'BC-TL-004', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(13, N'BC-TL-005', N'AVAILABLE', N'Mới 100%', GETDATE()), (13, N'BC-TL-006', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(14, N'BC-TL-007', N'AVAILABLE', N'Mới 100%', GETDATE()), (14, N'BC-TL-008', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(15, N'BC-TL-009', N'AVAILABLE', N'Mới 100%', GETDATE()), (15, N'BC-TL-010', N'AVAILABLE', N'Mới 100%', GETDATE()),
+(11, N'BC-TL-001', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (11, N'BC-TL-002', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(12, N'BC-TL-003', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (12, N'BC-TL-004', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(13, N'BC-TL-005', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (13, N'BC-TL-006', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(14, N'BC-TL-007', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (14, N'BC-TL-008', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(15, N'BC-TL-009', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (15, N'BC-TL-010', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
 
 -- Sách Văn học VN (16 -> 20)
-(16, N'BC-VN-001', N'AVAILABLE', N'Mới 100%', GETDATE()), (16, N'BC-VN-002', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(17, N'BC-VN-003', N'AVAILABLE', N'Mới 100%', GETDATE()), (17, N'BC-VN-004', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(18, N'BC-VN-005', N'AVAILABLE', N'Mới 100%', GETDATE()), (18, N'BC-VN-006', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(19, N'BC-VN-007', N'AVAILABLE', N'Mới 100%', GETDATE()), (19, N'BC-VN-008', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(20, N'BC-VN-009', N'AVAILABLE', N'Mới 100%', GETDATE()), (20, N'BC-VN-010', N'AVAILABLE', N'Mới 100%', GETDATE()),
+(16, N'BC-VN-001', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (16, N'BC-VN-002', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(17, N'BC-VN-003', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (17, N'BC-VN-004', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(18, N'BC-VN-005', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (18, N'BC-VN-006', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(19, N'BC-VN-007', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (19, N'BC-VN-008', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(20, N'BC-VN-009', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (20, N'BC-VN-010', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
 
 -- Sách Văn học QT (21 -> 25)
-(21, N'BC-QT-001', N'AVAILABLE', N'Mới 100%', GETDATE()), (21, N'BC-QT-002', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(22, N'BC-QT-003', N'AVAILABLE', N'Mới 100%', GETDATE()), (22, N'BC-QT-004', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(23, N'BC-QT-005', N'AVAILABLE', N'Mới 100%', GETDATE()), (23, N'BC-QT-006', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(24, N'BC-QT-007', N'AVAILABLE', N'Mới 100%', GETDATE()), (24, N'BC-QT-008', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(25, N'BC-QT-009', N'AVAILABLE', N'Mới 100%', GETDATE()), (25, N'BC-QT-010', N'AVAILABLE', N'Mới 100%', GETDATE()),
+(21, N'BC-QT-001', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (21, N'BC-QT-002', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(22, N'BC-QT-003', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (22, N'BC-QT-004', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(23, N'BC-QT-005', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (23, N'BC-QT-006', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(24, N'BC-QT-007', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (24, N'BC-QT-008', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(25, N'BC-QT-009', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (25, N'BC-QT-010', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
 
 -- Sách Khoa học (26 -> 30)
-(26, N'BC-KH-001', N'AVAILABLE', N'Mới 100%', GETDATE()), (26, N'BC-KH-002', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(27, N'BC-KH-003', N'AVAILABLE', N'Mới 100%', GETDATE()), (27, N'BC-KH-004', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(28, N'BC-KH-005', N'AVAILABLE', N'Mới 100%', GETDATE()), (28, N'BC-KH-006', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(29, N'BC-KH-007', N'AVAILABLE', N'Mới 100%', GETDATE()), (29, N'BC-KH-008', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(30, N'BC-KH-009', N'AVAILABLE', N'Mới 100%', GETDATE()), (30, N'BC-KH-010', N'AVAILABLE', N'Mới 100%', GETDATE()),
+(26, N'BC-KH-001', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (26, N'BC-KH-002', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(27, N'BC-KH-003', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (27, N'BC-KH-004', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(28, N'BC-KH-005', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (28, N'BC-KH-006', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(29, N'BC-KH-007', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (29, N'BC-KH-008', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(30, N'BC-KH-009', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (30, N'BC-KH-010', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
 
 -- Sách Lịch sử (31 -> 35)
-(31, N'BC-LS-001', N'AVAILABLE', N'Mới 100%', GETDATE()), (31, N'BC-LS-002', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(32, N'BC-LS-003', N'AVAILABLE', N'Mới 100%', GETDATE()), (32, N'BC-LS-004', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(33, N'BC-LS-005', N'AVAILABLE', N'Mới 100%', GETDATE()), (33, N'BC-LS-006', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(34, N'BC-LS-007', N'AVAILABLE', N'Mới 100%', GETDATE()), (34, N'BC-LS-008', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(35, N'BC-LS-009', N'AVAILABLE', N'Mới 100%', GETDATE()), (35, N'BC-LS-010', N'AVAILABLE', N'Mới 100%', GETDATE()),
+(31, N'BC-LS-001', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (31, N'BC-LS-002', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(32, N'BC-LS-003', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (32, N'BC-LS-004', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(33, N'BC-LS-005', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (33, N'BC-LS-006', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(34, N'BC-LS-007', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (34, N'BC-LS-008', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(35, N'BC-LS-009', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (35, N'BC-LS-010', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
 
 -- Sách Ngoại ngữ (36 -> 40)
-(36, N'BC-NN-001', N'AVAILABLE', N'Mới 100%', GETDATE()), (36, N'BC-NN-002', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(37, N'BC-NN-003', N'AVAILABLE', N'Mới 100%', GETDATE()), (37, N'BC-NN-004', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(38, N'BC-NN-005', N'AVAILABLE', N'Mới 100%', GETDATE()), (38, N'BC-NN-006', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(39, N'BC-NN-007', N'AVAILABLE', N'Mới 100%', GETDATE()), (39, N'BC-NN-008', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(40, N'BC-NN-009', N'AVAILABLE', N'Mới 100%', GETDATE()), (40, N'BC-NN-010', N'AVAILABLE', N'Mới 100%', GETDATE()),
+(36, N'BC-NN-001', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (36, N'BC-NN-002', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(37, N'BC-NN-003', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (37, N'BC-NN-004', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(38, N'BC-NN-005', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (38, N'BC-NN-006', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(39, N'BC-NN-007', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (39, N'BC-NN-008', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(40, N'BC-NN-009', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (40, N'BC-NN-010', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
 
 -- Sách Y học (41 -> 45)
-(41, N'BC-YH-001', N'AVAILABLE', N'Mới 100%', GETDATE()), (41, N'BC-YH-002', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(42, N'BC-YH-003', N'AVAILABLE', N'Mới 100%', GETDATE()), (42, N'BC-YH-004', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(43, N'BC-YH-005', N'AVAILABLE', N'Mới 100%', GETDATE()), (43, N'BC-YH-006', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(44, N'BC-YH-007', N'AVAILABLE', N'Mới 100%', GETDATE()), (44, N'BC-YH-008', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(45, N'BC-YH-009', N'AVAILABLE', N'Mới 100%', GETDATE()), (45, N'BC-YH-010', N'AVAILABLE', N'Mới 100%', GETDATE()),
+(41, N'BC-YH-001', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (41, N'BC-YH-002', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(42, N'BC-YH-003', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (42, N'BC-YH-004', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(43, N'BC-YH-005', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (43, N'BC-YH-006', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(44, N'BC-YH-007', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (44, N'BC-YH-008', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(45, N'BC-YH-009', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (45, N'BC-YH-010', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
 
 -- Sách Thiết kế (46 -> 50)
-(46, N'BC-TK-001', N'AVAILABLE', N'Mới 100%', GETDATE()), (46, N'BC-TK-002', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(47, N'BC-TK-003', N'AVAILABLE', N'Mới 100%', GETDATE()), (47, N'BC-TK-004', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(48, N'BC-TK-005', N'AVAILABLE', N'Mới 100%', GETDATE()), (48, N'BC-TK-006', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(49, N'BC-TK-007', N'AVAILABLE', N'Mới 100%', GETDATE()), (49, N'BC-TK-008', N'AVAILABLE', N'Mới 100%', GETDATE()),
-(50, N'BC-TK-009', N'AVAILABLE', N'Mới 100%', GETDATE()), (50, N'BC-TK-010', N'AVAILABLE', N'Mới 100%', GETDATE());
+(46, N'BC-TK-001', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (46, N'BC-TK-002', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(47, N'BC-TK-003', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (47, N'BC-TK-004', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(48, N'BC-TK-005', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (48, N'BC-TK-006', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(49, N'BC-TK-007', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (49, N'BC-TK-008', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'),
+(50, N'BC-TK-009', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00'), (50, N'BC-TK-010', N'AVAILABLE', N'Mới 100%', '2026-11-01T06:00:00');
 GO
 
 -- 6.6. Chèn Danh Sách 30 Thành Viên (Members: ID 1 -> 30)
@@ -572,40 +594,40 @@ INSERT INTO dbo.Members
 (MemberCardCode, FullName, PhoneNumber, Email, IdentityCardNumber, Address, DateOfBirth, DepositBalance, TotalDebt, IssueDate, ExpiryDate, CardStatus, Notes, CreatedAt) 
 VALUES
 -- Nhóm 1: Thành viên đang hoạt động mượn sách tích cực (1 -> 10)
-(N'DG20260001', N'Nguyễn Hoàng Long', N'0912345601', N'long.nh@gmail.com', N'001203000001', N'128 Hoàng Mai, Hoàng Mai, Hà Nội', '1996-05-15', 200000, 0, DATEADD(day, -120, GETDATE()), DATEADD(day, 245, GETDATE()), N'ACTIVE', N'Kỹ sư Phần mềm Senior - Thành viên thư viện', DATEADD(day, -120, GETDATE())),
-(N'DG20260002', N'Trần Thị Mai Anh', N'0987654302', N'maianh.tran@gmail.com', N'001203000002', N'45 Nguyễn Trãi, Thanh Xuân, Hà Nội', '1994-08-20', 500000, 0, DATEADD(day, -90, GETDATE()), DATEADD(day, 275, GETDATE()), N'ACTIVE', N'Chuyên viên Phân tích Đầu tư Tài chính - Thành viên thư viện', DATEADD(day, -90, GETDATE())),
-(N'DG20260003', N'Lê Minh Khang', N'0903112203', N'khang.lm@gmail.com', N'001203000003', N'88 Cầu Giấy, Cầu Giấy, Hà Nội', '1993-11-10', 200000, 15000, DATEADD(day, -80, GETDATE()), DATEADD(day, 285, GETDATE()), N'ACTIVE', N'Kỹ sư Tự động hóa & IoT - Thành viên thư viện (Có nợ phạt trễ hạn 15.000đ)', DATEADD(day, -80, GETDATE())),
-(N'DG20260004', N'Phạm Quỳnh Nga', N'0945223304', N'nga.pq@gmail.com', N'001203000004', N'12 Tôn Thất Tùng, Đống Đa, Hà Nội', '1995-02-28', 300000, 0, DATEADD(day, -75, GETDATE()), DATEADD(day, 290, GETDATE()), N'ACTIVE', N'Bác sĩ Đa khoa - Thành viên thư viện', DATEADD(day, -75, GETDATE())),
-(N'DG20260005', N'Vũ Đức Huy', N'0978334405', N'huy.vd@gmail.com', N'001203000005', N'204 Trần Phú, Hà Đông, Hà Nội', '1991-09-14', 400000, 0, DATEADD(day, -60, GETDATE()), DATEADD(day, 305, GETDATE()), N'ACTIVE', N'Kiến trúc sư Giải pháp Đám mây - Thành viên thư viện', DATEADD(day, -60, GETDATE())),
-(N'DG20260006', N'Đặng Thu Hà', N'0934445506', N'ha.dt@gmail.com', N'001203000006', N'56 Lê Văn Lương, Cầu Giấy, Hà Nội', '1997-12-05', 400000, 0, DATEADD(day, -55, GETDATE()), DATEADD(day, 310, GETDATE()), N'ACTIVE', N'Biên dịch viên Tự do - Thành viên thư viện', DATEADD(day, -55, GETDATE())),
-(N'DG20260007', N'Bùi Gia Bảo', N'0967556607', N'bao.bg@gmail.com', N'001203000007', N'77 Bạch Mai, Hai Bà Trưng, Hà Nội', '1996-07-22', 200000, 0, DATEADD(day, -50, GETDATE()), DATEADD(day, 315, GETDATE()), N'ACTIVE', N'Chuyên viên Quản lý Quỹ Đầu tư - Thành viên thư viện', DATEADD(day, -50, GETDATE())),
-(N'DG20260008', N'Đỗ Phương Thảo', N'0923667708', N'thao.dp@gmail.com', N'001203000008', N'19 Tràng Thi, Hoàn Kiếm, Hà Nội', '1992-04-18', 200000, 0, DATEADD(day, -45, GETDATE()), DATEADD(day, 320, GETDATE()), N'ACTIVE', N'Nhà nghiên cứu Lịch sử & Xuất bản - Thành viên thư viện', DATEADD(day, -45, GETDATE())),
-(N'DG20260009', N'Hoàng Văn Tuấn', N'0911778809', N'tuan.hv@gmail.com', N'001203000009', N'102 Giải Phóng, Hai Bà Trưng, Hà Nội', '1988-01-30', 0, 0, DATEADD(day, -400, GETDATE()), DATEADD(day, -35, GETDATE()), N'CLOSED', N'Thành viên chuyển nơi công tác - Thẻ đã hủy & hoàn trả 100% cọc', DATEADD(day, -400, GETDATE())),
-(N'DG20260010', N'Nguyễn Bảo Ngọc', N'0989889910', N'ngoc.nb@gmail.com', N'001203000010', N'34 Phạm Văn Đồng, Bắc Từ Liêm, Hà Nội', '1998-03-12', 200000, 0, DATEADD(day, -40, GETDATE()), DATEADD(day, 325, GETDATE()), N'LOCKED', N'Thẻ tạm thời bị khóa do thành viên báo rơi ví thẻ', DATEADD(day, -40, GETDATE())),
+(N'DG20260001', N'Nguyễn Hoàng Long', N'0912345601', N'long.nh@gmail.com', N'001203000001', N'128 Hoàng Mai, Hoàng Mai, Hà Nội', '1996-05-15', 200000, 0, '2026-11-01T07:00:00', '2027-11-01T07:00:00', N'ACTIVE', N'Kỹ sư Phần mềm Senior - Thành viên thư viện', '2026-11-01T07:00:00'),
+(N'DG20260002', N'Trần Thị Mai Anh', N'0987654302', N'maianh.tran@gmail.com', N'001203000002', N'45 Nguyễn Trãi, Thanh Xuân, Hà Nội', '1994-08-20', 500000, 0, '2026-11-01T07:00:00', '2027-11-01T07:00:00', N'ACTIVE', N'Chuyên viên Phân tích Đầu tư Tài chính - Thành viên thư viện', '2026-11-01T07:00:00'),
+(N'DG20260003', N'Lê Minh Khang', N'0903112203', N'khang.lm@gmail.com', N'001203000003', N'88 Cầu Giấy, Cầu Giấy, Hà Nội', '1993-11-10', 200000, 15000, '2026-11-01T07:00:00', '2027-11-01T07:00:00', N'ACTIVE', N'Kỹ sư Tự động hóa & IoT - Thành viên thư viện (Có nợ phạt trễ hạn 15.000đ)', '2026-11-01T07:00:00'),
+(N'DG20260004', N'Phạm Quỳnh Nga', N'0945223304', N'nga.pq@gmail.com', N'001203000004', N'12 Tôn Thất Tùng, Đống Đa, Hà Nội', '1995-02-28', 300000, 0, '2026-11-02T07:00:00', '2027-11-02T07:00:00', N'ACTIVE', N'Bác sĩ Đa khoa - Thành viên thư viện', '2026-11-02T07:00:00'),
+(N'DG20260005', N'Vũ Đức Huy', N'0978334405', N'huy.vd@gmail.com', N'001203000005', N'204 Trần Phú, Hà Đông, Hà Nội', '1991-09-14', 400000, 0, '2026-11-03T07:00:00', '2027-11-03T07:00:00', N'ACTIVE', N'Kiến trúc sư Giải pháp Đám mây - Thành viên thư viện', '2026-11-03T07:00:00'),
+(N'DG20260006', N'Đặng Thu Hà', N'0934445506', N'ha.dt@gmail.com', N'001203000006', N'56 Lê Văn Lương, Cầu Giấy, Hà Nội', '1997-12-05', 400000, 0, '2026-11-04T07:00:00', '2027-11-04T07:00:00', N'ACTIVE', N'Biên dịch viên Tự do - Thành viên thư viện', '2026-11-04T07:00:00'),
+(N'DG20260007', N'Bùi Gia Bảo', N'0967556607', N'bao.bg@gmail.com', N'001203000007', N'77 Bạch Mai, Hai Bà Trưng, Hà Nội', '1996-07-22', 200000, 0, '2026-11-05T07:00:00', '2027-11-05T07:00:00', N'ACTIVE', N'Chuyên viên Quản lý Quỹ Đầu tư - Thành viên thư viện', '2026-11-05T07:00:00'),
+(N'DG20260008', N'Đỗ Phương Thảo', N'0923667708', N'thao.dp@gmail.com', N'001203000008', N'19 Tràng Thi, Hoàn Kiếm, Hà Nội', '1992-04-18', 200000, 0, '2026-11-06T07:00:00', '2027-11-06T07:00:00', N'ACTIVE', N'Nhà nghiên cứu Lịch sử & Xuất bản - Thành viên thư viện', '2026-11-06T07:00:00'),
+(N'DG20260009', N'Hoàng Văn Tuấn', N'0911778809', N'tuan.hv@gmail.com', N'001203000009', N'102 Giải Phóng, Hai Bà Trưng, Hà Nội', '1988-01-30', 0, 0, '2025-11-08T07:00:00', '2026-11-08T07:00:00', N'CLOSED', N'Thành viên chuyển nơi công tác - Thẻ đã hủy & hoàn trả 100% cọc', '2025-11-08T07:00:00'),
+(N'DG20260010', N'Nguyễn Bảo Ngọc', N'0989889910', N'ngoc.nb@gmail.com', N'001203000010', N'34 Phạm Văn Đồng, Bắc Từ Liêm, Hà Nội', '1998-03-12', 200000, 0, '2026-11-07T07:00:00', '2027-11-07T07:00:00', N'LOCKED', N'Thẻ tạm thời bị khóa do thành viên báo rơi ví thẻ', '2026-11-07T07:00:00'),
 
 -- Nhóm 2: Chuyên gia, Nghiên cứu viên & Thành viên thường xuyên (11 -> 20)
-(N'DG20260011', N'TS. Lê Thành Nam', N'0904123411', N'nam.le@vittech.vn', N'001203000011', N'Tòa nhà A2, KĐT An Hưng, Hà Đông, Hà Nội', '1985-06-18', 1000000, 0, DATEADD(day, -150, GETDATE()), DATEADD(day, 215, GETDATE()), N'ACTIVE', N'Chuyên gia Tư vấn Chuyển đổi số - Thành viên thư viện', DATEADD(day, -150, GETDATE())),
-(N'DG20260012', N'ThS. Phạm Thu Trang', N'0918456712', N'trang.pham@globalcorp.vn', N'001203000012', N'CT4 The Pride, Tố Hữu, Hà Đông, Hà Nội', '1990-11-25', 600000, 0, DATEADD(day, -140, GETDATE()), DATEADD(day, 225, GETDATE()), N'ACTIVE', N'Giám đốc Phát triển Nhân lực - Thành viên thư viện', DATEADD(day, -140, GETDATE())),
-(N'DG20260013', N'Đinh Quốc Huy', N'0972334413', N'huy.dq@gmail.com', N'001203000013', N'15 Mễ Trì Hạ, Nam Từ Liêm, Hà Nội', '1995-09-08', 200000, 0, DATEADD(day, -35, GETDATE()), DATEADD(day, 330, GETDATE()), N'ACTIVE', N'Kỹ sư Dữ liệu lớn - Thành viên thư viện', DATEADD(day, -35, GETDATE())),
-(N'DG20260014', N'Võ Hoài An', N'0936556614', N'an.vh@gmail.com', N'001203000014', N'89 Xuân Thủy, Cầu Giấy, Hà Nội', '1997-01-14', 300000, 0, DATEADD(day, -30, GETDATE()), DATEADD(day, 335, GETDATE()), N'ACTIVE', N'Nhà phát triển Ứng dụng AI - Thành viên thư viện', DATEADD(day, -30, GETDATE())),
-(N'DG20260015', N'Trịnh Quang Hưng', N'0981778815', N'hung.tq@gmail.com', N'001203000015', N'22 Tây Sơn, Đống Đa, Hà Nội', '1992-04-22', 200000, 25000, DATEADD(day, -380, GETDATE()), DATEADD(day, -15, GETDATE()), N'EXPIRED', N'Thẻ thành viên hết hạn 1 năm - Còn khoản phạt chậm trả 25.000đ', DATEADD(day, -380, GETDATE())),
-(N'DG20260016', N'Lương Hải Yến', N'0908990016', N'yen.lh@gmail.com', N'001203000016', N'63 Nguyễn Khánh Toàn, Cầu Giấy, Hà Nội', '1994-10-30', 300000, 0, DATEADD(day, -28, GETDATE()), DATEADD(day, 337, GETDATE()), N'ACTIVE', N'Dược sĩ Nghiên cứu Lâm sàng - Thành viên thư viện', DATEADD(day, -28, GETDATE())),
-(N'DG20260017', N'Hà Anh Tuấn', N'0942113317', N'tuan.ha@gmail.com', N'001203000017', N'112 Phố Huế, Hai Bà Trưng, Hà Nội', '1993-08-12', 200000, 0, DATEADD(day, -25, GETDATE()), DATEADD(day, 340, GETDATE()), N'ACTIVE', N'Kỹ sư Thiết kế Cơ khí - Thành viên thư viện', DATEADD(day, -25, GETDATE())),
-(N'DG20260018', N'Mai Trọng Hiếu', N'0964224418', N'hieu.mt@gmail.com', N'001203000018', N'90 Láng Hạ, Đống Đa, Hà Nội', '1995-03-05', 200000, 0, DATEADD(day, -22, GETDATE()), DATEADD(day, 343, GETDATE()), N'ACTIVE', N'Quản lý Chuỗi Cung ứng - Thành viên thư viện', DATEADD(day, -22, GETDATE())),
-(N'DG20260019', N'Lý Khánh Linh', N'0979335519', N'linh.lk@gmail.com', N'001203000019', N'37 Hồ Tùng Mậu, Cầu Giấy, Hà Nội', '1998-07-19', 400000, 0, DATEADD(day, -20, GETDATE()), DATEADD(day, 345, GETDATE()), N'ACTIVE', N'Senior UI/UX Designer - Thành viên thư viện', DATEADD(day, -20, GETDATE())),
-(N'DG20260020', N'Phan Thanh Bình', N'0915446620', N'binh.pt@gmail.com', N'001203000020', N'180 Kim Mã, Ba Đình, Hà Nội', '1989-12-01', 0, 0, DATEADD(day, -420, GETDATE()), DATEADD(day, -55, GETDATE()), N'CLOSED', N'Thành viên hoàn tất dự án nghiên cứu & đóng thẻ rút cọc', DATEADD(day, -420, GETDATE())),
+(N'DG20260011', N'TS. Lê Thành Nam', N'0904123411', N'nam.le@vittech.vn', N'001203000011', N'Tòa nhà A2, KĐT An Hưng, Hà Đông, Hà Nội', '1985-06-18', 1000000, 0, '2026-11-01T07:00:00', '2027-11-01T07:00:00', N'ACTIVE', N'Chuyên gia Tư vấn Chuyển đổi số - Thành viên thư viện', '2026-11-01T07:00:00'),
+(N'DG20260012', N'ThS. Phạm Thu Trang', N'0918456712', N'trang.pham@globalcorp.vn', N'001203000012', N'CT4 The Pride, Tố Hữu, Hà Đông, Hà Nội', '1990-11-25', 600000, 0, '2026-11-02T07:00:00', '2027-11-02T07:00:00', N'ACTIVE', N'Giám đốc Phát triển Nhân lực - Thành viên thư viện', '2026-11-02T07:00:00'),
+(N'DG20260013', N'Đinh Quốc Huy', N'0972334413', N'huy.dq@gmail.com', N'001203000013', N'15 Mễ Trì Hạ, Nam Từ Liêm, Hà Nội', '1995-09-08', 200000, 0, '2026-11-03T07:00:00', '2027-11-03T07:00:00', N'ACTIVE', N'Kỹ sư Dữ liệu lớn - Thành viên thư viện', '2026-11-03T07:00:00'),
+(N'DG20260014', N'Võ Hoài An', N'0936556614', N'an.vh@gmail.com', N'001203000014', N'89 Xuân Thủy, Cầu Giấy, Hà Nội', '1997-01-14', 300000, 0, '2026-11-04T07:00:00', '2027-11-04T07:00:00', N'ACTIVE', N'Nhà phát triển Ứng dụng AI - Thành viên thư viện', '2026-11-04T07:00:00'),
+(N'DG20260015', N'Trịnh Quang Hưng', N'0981778815', N'hung.tq@gmail.com', N'001203000015', N'22 Tây Sơn, Đống Đa, Hà Nội', '1992-04-22', 200000, 25000, '2025-11-16T07:00:00', '2026-11-16T07:00:00', N'EXPIRED', N'Thẻ thành viên hết hạn 1 năm - Còn khoản phạt chậm trả 25.000đ', '2025-11-16T07:00:00'),
+(N'DG20260016', N'Lương Hải Yến', N'0908990016', N'yen.lh@gmail.com', N'001203000016', N'63 Nguyễn Khánh Toàn, Cầu Giấy, Hà Nội', '1994-10-30', 300000, 0, '2026-11-05T07:00:00', '2027-11-05T07:00:00', N'ACTIVE', N'Dược sĩ Nghiên cứu Lâm sàng - Thành viên thư viện', '2026-11-05T07:00:00'),
+(N'DG20260017', N'Hà Anh Tuấn', N'0942113317', N'tuan.ha@gmail.com', N'001203000017', N'112 Phố Huế, Hai Bà Trưng, Hà Nội', '1993-08-12', 200000, 0, '2026-11-06T07:00:00', '2027-11-06T07:00:00', N'ACTIVE', N'Kỹ sư Thiết kế Cơ khí - Thành viên thư viện', '2026-11-06T07:00:00'),
+(N'DG20260018', N'Mai Trọng Hiếu', N'0964224418', N'hieu.mt@gmail.com', N'001203000018', N'90 Láng Hạ, Đống Đa, Hà Nội', '1995-03-05', 200000, 0, '2026-11-07T07:00:00', '2027-11-07T07:00:00', N'ACTIVE', N'Quản lý Chuỗi Cung ứng - Thành viên thư viện', '2026-11-07T07:00:00'),
+(N'DG20260019', N'Lý Khánh Linh', N'0979335519', N'linh.lk@gmail.com', N'001203000019', N'37 Hồ Tùng Mậu, Cầu Giấy, Hà Nội', '1998-07-19', 400000, 0, '2026-11-08T07:00:00', '2027-11-08T07:00:00', N'ACTIVE', N'Senior UI/UX Designer - Thành viên thư viện', '2026-11-08T07:00:00'),
+(N'DG20260020', N'Phan Thanh Bình', N'0915446620', N'binh.pt@gmail.com', N'001203000020', N'180 Kim Mã, Ba Đình, Hà Nội', '1989-12-01', 0, 0, '2025-11-10T07:00:00', '2026-11-10T07:00:00', N'CLOSED', N'Thành viên hoàn tất dự án nghiên cứu & đóng thẻ rút cọc', '2025-11-10T07:00:00'),
 
 -- Nhóm 3: Thành viên mới đăng ký & Tự do (21 -> 30)
-(N'DG20260021', N'Dương Gia Huy', N'0986557721', N'huy.dg@gmail.com', N'001203000021', N'52 Lạc Long Quân, Tây Hồ, Hà Nội', '1999-05-10', 200000, 0, DATEADD(day, -18, GETDATE()), DATEADD(day, 347, GETDATE()), N'ACTIVE', N'Lập trình viên Backend / DevOps - Thành viên mới', DATEADD(day, -18, GETDATE())),
-(N'DG20260022', N'Tạ Thị Mỹ Duyên', N'0906668822', N'duyen.ttm@gmail.com', N'001203000022', N'28 Nguyễn Huy Tưởng, Thanh Xuân, Hà Nội', '1996-11-17', 200000, 0, DATEADD(day, -15, GETDATE()), DATEADD(day, 350, GETDATE()), N'ACTIVE', N'Quản lý Khách sạn & Du lịch - Thành viên mới', DATEADD(day, -15, GETDATE())),
-(N'DG20260023', N'Cao Văn Sơn', N'0938779923', N'son.cv@gmail.com', N'001203000023', N'144 Đội Cấn, Ba Đình, Hà Nội', '1994-03-24', 200000, 0, DATEADD(day, -14, GETDATE()), DATEADD(day, 351, GETDATE()), N'ACTIVE', N'Kỹ sư Robot & Tự động hóa - Thành viên mới', DATEADD(day, -14, GETDATE())),
-(N'DG20260024', N'Chu Kim Ngân', N'0971880024', N'ngan.ck@gmail.com', N'001203000024', N'83 Nguyễn Chí Thanh, Đống Đa, Hà Nội', '1995-06-30', 500000, 0, DATEADD(day, -12, GETDATE()), DATEADD(day, 353, GETDATE()), N'ACTIVE', N'Chuyên viên Tư vấn Rủi ro Tài chính - Thành viên mới', DATEADD(day, -12, GETDATE())),
-(N'DG20260025', N'Trần Quốc Bảo', N'0983991125', N'bao.tq@gmail.com', N'001203000025', N'67 Xã Đàn, Đống Đa, Hà Nội', '1993-09-15', 200000, 50000, DATEADD(day, -70, GETDATE()), DATEADD(day, 295, GETDATE()), N'LOCKED', N'Thẻ tạm khóa tự động do quá hạn sách > 20 ngày chưa hoàn trả', DATEADD(day, -70, GETDATE())),
-(N'DG20260026', N'Nghiêm Minh Nhật', N'0917112226', N'nhat.nm@gmail.com', N'001203000026', N'109 Định Công, Hoàng Mai, Hà Nội', '1998-02-14', 300000, 0, DATEADD(day, -8, GETDATE()), DATEADD(day, 357, GETDATE()), N'ACTIVE', N'Chuyên viên An toàn Thông tin - Thành viên mới', DATEADD(day, -8, GETDATE())),
-(N'DG20260027', N'Lâm Bích Trâm', N'0948223327', N'tram.lb@gmail.com', N'001203000027', N'40 Hàng Bông, Hoàn Kiếm, Hà Nội', '1996-12-08', 200000, 0, DATEADD(day, -6, GETDATE()), DATEADD(day, 359, GETDATE()), N'ACTIVE', N'Nghiên cứu viên Công nghệ Sinh học - Thành viên mới', DATEADD(day, -6, GETDATE())),
-(N'DG20260028', N'Đoàn Văn Hậu', N'0969334428', N'hau.dv@gmail.com', N'001203000028', N'195 Khâm Thiên, Đống Đa, Hà Nội', '1991-04-19', 200000, 0, DATEADD(day, -370, GETDATE()), DATEADD(day, -5, GETDATE()), N'EXPIRED', N'Hết hạn thẻ mượn sách, thành viên chưa làm thủ tục gia hạn', DATEADD(day, -370, GETDATE())),
-(N'DG20260029', N'La Ngọc Diệp', N'0975445529', N'diep.ln@gmail.com', N'001203000029', N'11 Thụy Khuê, Tây Hồ, Hà Nội', '1999-08-27', 200000, 0, DATEADD(day, -3, GETDATE()), DATEADD(day, 362, GETDATE()), N'ACTIVE', N'Quản lý Vận hành E-Commerce - Thành viên mới', DATEADD(day, -3, GETDATE())),
-(N'DG20260030', N'Phùng Thế Vinh', N'0902556630', N'vinh.pt@gmail.com', N'001203000030', N'75 Vũ Trọng Phụng, Thanh Xuân, Hà Nội', '1997-10-03', 200000, 0, DATEADD(day, -1, GETDATE()), DATEADD(day, 364, GETDATE()), N'ACTIVE', N'Thành viên mới kích hoạt tài khoản Cổng dịch vụ đọc');
+(N'DG20260021', N'Dương Gia Huy', N'0986557721', N'huy.dg@gmail.com', N'001203000021', N'52 Lạc Long Quân, Tây Hồ, Hà Nội', '1999-05-10', 200000, 0, '2026-11-12T07:00:00', '2027-11-12T07:00:00', N'ACTIVE', N'Lập trình viên Backend / DevOps - Thành viên mới', '2026-11-12T07:00:00'),
+(N'DG20260022', N'Tạ Thị Mỹ Duyên', N'0906668822', N'duyen.ttm@gmail.com', N'001203000022', N'28 Nguyễn Huy Tưởng, Thanh Xuân, Hà Nội', '1996-11-17', 200000, 0, '2026-11-14T07:00:00', '2027-11-14T07:00:00', N'ACTIVE', N'Quản lý Khách sạn & Du lịch - Thành viên mới', '2026-11-14T07:00:00'),
+(N'DG20260023', N'Cao Văn Sơn', N'0938779923', N'son.cv@gmail.com', N'001203000023', N'144 Đội Cấn, Ba Đình, Hà Nội', '1994-03-24', 200000, 0, '2026-11-15T07:00:00', '2027-11-15T07:00:00', N'ACTIVE', N'Kỹ sư Robot & Tự động hóa - Thành viên mới', '2026-11-15T07:00:00'),
+(N'DG20260024', N'Chu Kim Ngân', N'0971880024', N'ngan.ck@gmail.com', N'001203000024', N'83 Nguyễn Chí Thanh, Đống Đa, Hà Nội', '1995-06-30', 500000, 0, '2026-11-16T07:00:00', '2027-11-16T07:00:00', N'ACTIVE', N'Chuyên viên Tư vấn Rủi ro Tài chính - Thành viên mới', '2026-11-16T07:00:00'),
+(N'DG20260025', N'Trần Quốc Bảo', N'0983991125', N'bao.tq@gmail.com', N'001203000025', N'67 Xã Đàn, Đống Đa, Hà Nội', '1993-09-15', 200000, 50000, '2026-11-04T07:00:00', '2027-11-04T07:00:00', N'LOCKED', N'Thẻ tạm khóa do chưa trả sách quá hạn tại mốc dữ liệu 30/11/2026', '2026-11-04T07:00:00'),
+(N'DG20260026', N'Nghiêm Minh Nhật', N'0917112226', N'nhat.nm@gmail.com', N'001203000026', N'109 Định Công, Hoàng Mai, Hà Nội', '1998-02-14', 300000, 0, '2026-11-20T07:00:00', '2027-11-20T07:00:00', N'ACTIVE', N'Chuyên viên An toàn Thông tin - Thành viên mới', '2026-11-20T07:00:00'),
+(N'DG20260027', N'Lâm Bích Trâm', N'0948223327', N'tram.lb@gmail.com', N'001203000027', N'40 Hàng Bông, Hoàn Kiếm, Hà Nội', '1996-12-08', 200000, 0, '2026-11-22T07:00:00', '2027-11-22T07:00:00', N'ACTIVE', N'Nghiên cứu viên Công nghệ Sinh học - Thành viên mới', '2026-11-22T07:00:00'),
+(N'DG20260028', N'Đoàn Văn Hậu', N'0969334428', N'hau.dv@gmail.com', N'001203000028', N'195 Khâm Thiên, Đống Đa, Hà Nội', '1991-04-19', 200000, 0, '2025-11-25T07:00:00', '2026-11-25T07:00:00', N'EXPIRED', N'Hết hạn thẻ mượn sách, thành viên chưa làm thủ tục gia hạn', '2025-11-25T07:00:00'),
+(N'DG20260029', N'La Ngọc Diệp', N'0975445529', N'diep.ln@gmail.com', N'001203000029', N'11 Thụy Khuê, Tây Hồ, Hà Nội', '1999-08-27', 200000, 0, '2026-11-26T07:00:00', '2027-11-26T07:00:00', N'ACTIVE', N'Quản lý Vận hành E-Commerce - Thành viên mới', '2026-11-26T07:00:00'),
+(N'DG20260030', N'Phùng Thế Vinh', N'0902556630', N'vinh.pt@gmail.com', N'001203000030', N'75 Vũ Trọng Phụng, Thanh Xuân, Hà Nội', '1997-10-03', 200000, 0, '2026-11-28T07:00:00', '2027-11-28T07:00:00', N'ACTIVE', N'Thành viên mới kích hoạt tài khoản Cổng dịch vụ đọc', '2026-11-28T07:00:00');
 GO
 
 -- 6.7. Chèn 30 Tài Khoản Cổng Thành Viên (UserAccounts: Reader Portal)
@@ -616,36 +638,36 @@ DECLARE @ReaderRoleId INT = (SELECT TOP 1 RoleId FROM dbo.Roles WHERE RoleName =
 INSERT INTO dbo.UserAccounts 
 (Username, PasswordHash, PasswordSalt, FullName, Email, PhoneNumber, RoleId, MemberId, IsActive, CreatedAt) 
 VALUES
-(N'DG20260001', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Nguyễn Hoàng Long', N'long.nh@gmail.com', N'0912345601', @ReaderRoleId, 1, 1, DATEADD(day, -120, GETDATE())),
-(N'DG20260002', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Trần Thị Mai Anh', N'maianh.tran@gmail.com', N'0987654302', @ReaderRoleId, 2, 1, DATEADD(day, -90, GETDATE())),
-(N'DG20260003', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Lê Minh Khang', N'khang.lm@gmail.com', N'0903112203', @ReaderRoleId, 3, 1, DATEADD(day, -80, GETDATE())),
-(N'DG20260004', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Phạm Quỳnh Nga', N'nga.pq@gmail.com', N'0945223304', @ReaderRoleId, 4, 1, DATEADD(day, -75, GETDATE())),
-(N'DG20260005', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Vũ Đức Huy', N'huy.vd@gmail.com', N'0978334405', @ReaderRoleId, 5, 1, DATEADD(day, -60, GETDATE())),
-(N'DG20260006', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Đặng Thu Hà', N'ha.dt@gmail.com', N'0934445506', @ReaderRoleId, 6, 1, DATEADD(day, -55, GETDATE())),
-(N'DG20260007', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Bùi Gia Bảo', N'bao.bg@gmail.com', N'0967556607', @ReaderRoleId, 7, 1, DATEADD(day, -50, GETDATE())),
-(N'DG20260008', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Đỗ Phương Thảo', N'thao.dp@gmail.com', N'0923667708', @ReaderRoleId, 8, 1, DATEADD(day, -45, GETDATE())),
-(N'DG20260009', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Hoàng Văn Tuấn', N'tuan.hv@gmail.com', N'0911778809', @ReaderRoleId, 9, 0, DATEADD(day, -400, GETDATE())),
-(N'DG20260010', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Nguyễn Bảo Ngọc', N'ngoc.nb@gmail.com', N'0989889910', @ReaderRoleId, 10, 0, DATEADD(day, -40, GETDATE())),
-(N'DG20260011', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'TS. Lê Thành Nam', N'nam.le@vittech.vn', N'0904123411', @ReaderRoleId, 11, 1, DATEADD(day, -150, GETDATE())),
-(N'DG20260012', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'ThS. Phạm Thu Trang', N'trang.pham@globalcorp.vn', N'0918456712', @ReaderRoleId, 12, 1, DATEADD(day, -140, GETDATE())),
-(N'DG20260013', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Đinh Quốc Huy', N'huy.dq@gmail.com', N'0972334413', @ReaderRoleId, 13, 1, DATEADD(day, -35, GETDATE())),
-(N'DG20260014', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Võ Hoài An', N'an.vh@gmail.com', N'0936556614', @ReaderRoleId, 14, 1, DATEADD(day, -30, GETDATE())),
-(N'DG20260015', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Trịnh Quang Hưng', N'hung.tq@gmail.com', N'0981778815', @ReaderRoleId, 15, 1, DATEADD(day, -380, GETDATE())),
-(N'DG20260016', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Lương Hải Yến', N'yen.lh@gmail.com', N'0908990016', @ReaderRoleId, 16, 1, DATEADD(day, -28, GETDATE())),
-(N'DG20260017', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Hà Anh Tuấn', N'tuan.ha@gmail.com', N'0942113317', @ReaderRoleId, 17, 1, DATEADD(day, -25, GETDATE())),
-(N'DG20260018', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Mai Trọng Hiếu', N'hieu.mt@gmail.com', N'0964224418', @ReaderRoleId, 18, 1, DATEADD(day, -22, GETDATE())),
-(N'DG20260019', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Lý Khánh Linh', N'linh.lk@gmail.com', N'0979335519', @ReaderRoleId, 19, 1, DATEADD(day, -20, GETDATE())),
-(N'DG20260020', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Phan Thanh Bình', N'binh.pt@gmail.com', N'0915446620', @ReaderRoleId, 20, 0, DATEADD(day, -420, GETDATE())),
-(N'DG20260021', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Dương Gia Huy', N'huy.dg@gmail.com', N'0986557721', @ReaderRoleId, 21, 1, DATEADD(day, -18, GETDATE())),
-(N'DG20260022', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Tạ Thị Mỹ Duyên', N'duyen.ttm@gmail.com', N'0906668822', @ReaderRoleId, 22, 1, DATEADD(day, -15, GETDATE())),
-(N'DG20260023', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Cao Văn Sơn', N'son.cv@gmail.com', N'0938779923', @ReaderRoleId, 23, 1, DATEADD(day, -14, GETDATE())),
-(N'DG20260024', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Chu Kim Ngân', N'ngan.ck@gmail.com', N'0971880024', @ReaderRoleId, 24, 1, DATEADD(day, -12, GETDATE())),
-(N'DG20260025', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Trần Quốc Bảo', N'bao.tq@gmail.com', N'0983991125', @ReaderRoleId, 25, 0, DATEADD(day, -70, GETDATE())),
-(N'DG20260026', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Nghiêm Minh Nhật', N'nhat.nm@gmail.com', N'0917112226', @ReaderRoleId, 26, 1, DATEADD(day, -8, GETDATE())),
-(N'DG20260027', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Lâm Bích Trâm', N'tram.lb@gmail.com', N'0948223327', @ReaderRoleId, 27, 1, DATEADD(day, -6, GETDATE())),
-(N'DG20260028', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Đoàn Văn Hậu', N'hau.dv@gmail.com', N'0969334428', @ReaderRoleId, 28, 1, DATEADD(day, -370, GETDATE())),
-(N'DG20260029', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'La Ngọc Diệp', N'diep.ln@gmail.com', N'0975445529', @ReaderRoleId, 29, 1, DATEADD(day, -3, GETDATE())),
-(N'DG20260030', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Phùng Thế Vinh', N'vinh.pt@gmail.com', N'0902556630', @ReaderRoleId, 30, 1, DATEADD(day, -1, GETDATE()));
+(N'DG20260001', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Nguyễn Hoàng Long', N'long.nh@gmail.com', N'0912345601', @ReaderRoleId, 1, 1, '2026-11-01T07:00:00'),
+(N'DG20260002', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Trần Thị Mai Anh', N'maianh.tran@gmail.com', N'0987654302', @ReaderRoleId, 2, 1, '2026-11-01T07:00:00'),
+(N'DG20260003', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Lê Minh Khang', N'khang.lm@gmail.com', N'0903112203', @ReaderRoleId, 3, 1, '2026-11-01T07:00:00'),
+(N'DG20260004', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Phạm Quỳnh Nga', N'nga.pq@gmail.com', N'0945223304', @ReaderRoleId, 4, 1, '2026-11-02T07:00:00'),
+(N'DG20260005', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Vũ Đức Huy', N'huy.vd@gmail.com', N'0978334405', @ReaderRoleId, 5, 1, '2026-11-03T07:00:00'),
+(N'DG20260006', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Đặng Thu Hà', N'ha.dt@gmail.com', N'0934445506', @ReaderRoleId, 6, 1, '2026-11-04T07:00:00'),
+(N'DG20260007', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Bùi Gia Bảo', N'bao.bg@gmail.com', N'0967556607', @ReaderRoleId, 7, 1, '2026-11-05T07:00:00'),
+(N'DG20260008', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Đỗ Phương Thảo', N'thao.dp@gmail.com', N'0923667708', @ReaderRoleId, 8, 1, '2026-11-06T07:00:00'),
+(N'DG20260009', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Hoàng Văn Tuấn', N'tuan.hv@gmail.com', N'0911778809', @ReaderRoleId, 9, 0, '2025-11-08T07:00:00'),
+(N'DG20260010', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Nguyễn Bảo Ngọc', N'ngoc.nb@gmail.com', N'0989889910', @ReaderRoleId, 10, 0, '2026-11-07T07:00:00'),
+(N'DG20260011', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'TS. Lê Thành Nam', N'nam.le@vittech.vn', N'0904123411', @ReaderRoleId, 11, 1, '2026-11-01T07:00:00'),
+(N'DG20260012', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'ThS. Phạm Thu Trang', N'trang.pham@globalcorp.vn', N'0918456712', @ReaderRoleId, 12, 1, '2026-11-02T07:00:00'),
+(N'DG20260013', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Đinh Quốc Huy', N'huy.dq@gmail.com', N'0972334413', @ReaderRoleId, 13, 1, '2026-11-03T07:00:00'),
+(N'DG20260014', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Võ Hoài An', N'an.vh@gmail.com', N'0936556614', @ReaderRoleId, 14, 1, '2026-11-04T07:00:00'),
+(N'DG20260015', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Trịnh Quang Hưng', N'hung.tq@gmail.com', N'0981778815', @ReaderRoleId, 15, 1, '2025-11-16T07:00:00'),
+(N'DG20260016', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Lương Hải Yến', N'yen.lh@gmail.com', N'0908990016', @ReaderRoleId, 16, 1, '2026-11-05T07:00:00'),
+(N'DG20260017', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Hà Anh Tuấn', N'tuan.ha@gmail.com', N'0942113317', @ReaderRoleId, 17, 1, '2026-11-06T07:00:00'),
+(N'DG20260018', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Mai Trọng Hiếu', N'hieu.mt@gmail.com', N'0964224418', @ReaderRoleId, 18, 1, '2026-11-07T07:00:00'),
+(N'DG20260019', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Lý Khánh Linh', N'linh.lk@gmail.com', N'0979335519', @ReaderRoleId, 19, 1, '2026-11-08T07:00:00'),
+(N'DG20260020', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Phan Thanh Bình', N'binh.pt@gmail.com', N'0915446620', @ReaderRoleId, 20, 0, '2025-11-10T07:00:00'),
+(N'DG20260021', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Dương Gia Huy', N'huy.dg@gmail.com', N'0986557721', @ReaderRoleId, 21, 1, '2026-11-12T07:00:00'),
+(N'DG20260022', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Tạ Thị Mỹ Duyên', N'duyen.ttm@gmail.com', N'0906668822', @ReaderRoleId, 22, 1, '2026-11-14T07:00:00'),
+(N'DG20260023', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Cao Văn Sơn', N'son.cv@gmail.com', N'0938779923', @ReaderRoleId, 23, 1, '2026-11-15T07:00:00'),
+(N'DG20260024', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Chu Kim Ngân', N'ngan.ck@gmail.com', N'0971880024', @ReaderRoleId, 24, 1, '2026-11-16T07:00:00'),
+(N'DG20260025', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Trần Quốc Bảo', N'bao.tq@gmail.com', N'0983991125', @ReaderRoleId, 25, 0, '2026-11-04T07:00:00'),
+(N'DG20260026', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Nghiêm Minh Nhật', N'nhat.nm@gmail.com', N'0917112226', @ReaderRoleId, 26, 1, '2026-11-20T07:00:00'),
+(N'DG20260027', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Lâm Bích Trâm', N'tram.lb@gmail.com', N'0948223327', @ReaderRoleId, 27, 1, '2026-11-22T07:00:00'),
+(N'DG20260028', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Đoàn Văn Hậu', N'hau.dv@gmail.com', N'0969334428', @ReaderRoleId, 28, 1, '2025-11-25T07:00:00'),
+(N'DG20260029', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'La Ngọc Diệp', N'diep.ln@gmail.com', N'0975445529', @ReaderRoleId, 29, 1, '2026-11-26T07:00:00'),
+(N'DG20260030', N'72D69FE48D119E721A5C26712BF734151AF9B70AD0419BC6480BD55344B6B638', N'LIB_OPS_SALT_2026', N'Phùng Thế Vinh', N'vinh.pt@gmail.com', N'0902556630', @ReaderRoleId, 30, 1, '2026-11-28T07:00:00');
 GO
 
 -- 6.8. Ghi Sổ Cái Giao Dịch Tiền Cọc Thế Chân (DepositTransactions)
@@ -653,58 +675,58 @@ INSERT INTO dbo.DepositTransactions
 (MemberId, HandledByUserId, TransactionType, Amount, BalanceAfter, ReceiptCode, TransactionDate, Notes) 
 VALUES
 -- Nộp cọc mở thẻ ban đầu (200.000đ mỗi thành viên)
-(1, 1, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260520-001', DATEADD(day, -120, GETDATE()), N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
-(2, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260620-002', DATEADD(day, -90, GETDATE()), N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
-(3, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260630-003', DATEADD(day, -80, GETDATE()), N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
-(4, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260705-004', DATEADD(day, -75, GETDATE()), N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
-(5, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260720-005', DATEADD(day, -60, GETDATE()), N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
-(6, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260725-006', DATEADD(day, -55, GETDATE()), N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
-(7, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260730-007', DATEADD(day, -50, GETDATE()), N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
-(8, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260805-008', DATEADD(day, -45, GETDATE()), N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
-(9, 1, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20250810-009', DATEADD(day, -400, GETDATE()), N'Nộp tiền cọc mở thẻ ban đầu'),
-(10, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260810-010', DATEADD(day, -40, GETDATE()), N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
-(11, 1, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260420-011', DATEADD(day, -150, GETDATE()), N'Nộp tiền cọc ban đầu mở thẻ thành viên'),
-(12, 1, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260502-012', DATEADD(day, -140, GETDATE()), N'Nộp tiền cọc ban đầu mở thẻ thành viên'),
-(13, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260815-013', DATEADD(day, -35, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(14, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260820-014', DATEADD(day, -30, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(15, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20250901-015', DATEADD(day, -380, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(16, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260822-016', DATEADD(day, -28, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(17, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260825-017', DATEADD(day, -25, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(18, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260828-018', DATEADD(day, -22, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(19, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260830-019', DATEADD(day, -20, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(20, 1, N'INITIAL_DEPOSIT', 500000, 500000, N'REC-DEP-20250715-020', DATEADD(day, -420, GETDATE()), N'Nộp tiền cọc mở thẻ thành viên'),
-(21, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260901-021', DATEADD(day, -18, GETDATE()), N'Nộp tiền cọc thành viên mới'),
-(22, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260904-022', DATEADD(day, -15, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(23, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260905-023', DATEADD(day, -14, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(24, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260907-024', DATEADD(day, -12, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(25, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260710-025', DATEADD(day, -70, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(26, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260911-026', DATEADD(day, -8, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(27, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260913-027', DATEADD(day, -6, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(28, 1, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20250910-028', DATEADD(day, -370, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(29, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260916-029', DATEADD(day, -3, GETDATE()), N'Nộp tiền cọc mở thẻ'),
-(30, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20260918-030', DATEADD(day, -1, GETDATE()), N'Nộp tiền cọc mở thẻ');
+(1, 1, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261101-001', '2026-11-01T07:15:00', N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
+(2, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261101-002', '2026-11-01T07:15:00', N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
+(3, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261101-003', '2026-11-01T07:15:00', N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
+(4, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261102-004', '2026-11-02T07:15:00', N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
+(5, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261103-005', '2026-11-03T07:15:00', N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
+(6, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261104-006', '2026-11-04T07:15:00', N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
+(7, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261105-007', '2026-11-05T07:15:00', N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
+(8, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261106-008', '2026-11-06T07:15:00', N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
+(9, 1, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20251108-009', '2025-11-08T07:15:00', N'Nộp tiền cọc mở thẻ ban đầu'),
+(10, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261107-010', '2026-11-07T07:15:00', N'Nộp tiền cọc thế chân mở thẻ mới tại quầy'),
+(11, 1, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261101-011', '2026-11-01T07:15:00', N'Nộp tiền cọc ban đầu mở thẻ thành viên'),
+(12, 1, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261102-012', '2026-11-02T07:15:00', N'Nộp tiền cọc ban đầu mở thẻ thành viên'),
+(13, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261103-013', '2026-11-03T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(14, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261104-014', '2026-11-04T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(15, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20251116-015', '2025-11-16T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(16, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261105-016', '2026-11-05T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(17, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261106-017', '2026-11-06T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(18, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261107-018', '2026-11-07T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(19, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261108-019', '2026-11-08T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(20, 1, N'INITIAL_DEPOSIT', 500000, 500000, N'REC-DEP-20251110-020', '2025-11-10T07:15:00', N'Nộp tiền cọc mở thẻ thành viên'),
+(21, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261112-021', '2026-11-12T07:15:00', N'Nộp tiền cọc thành viên mới'),
+(22, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261114-022', '2026-11-14T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(23, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261115-023', '2026-11-15T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(24, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261116-024', '2026-11-16T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(25, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261104-025', '2026-11-04T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(26, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261120-026', '2026-11-20T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(27, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261122-027', '2026-11-22T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(28, 1, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20251125-028', '2025-11-25T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(29, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261126-029', '2026-11-26T07:15:00', N'Nộp tiền cọc mở thẻ'),
+(30, 2, N'INITIAL_DEPOSIT', 200000, 200000, N'REC-DEP-20261128-030', '2026-11-28T07:15:00', N'Nộp tiền cọc mở thẻ');
 
 -- Giao dịch nạp thêm cọc (TOPUP_DEPOSIT) nâng hạn mức mượn qua VietQR PayOS & Quầy
 INSERT INTO dbo.DepositTransactions 
 (MemberId, HandledByUserId, TransactionType, Amount, BalanceAfter, ReceiptCode, TransactionDate, Notes) 
 VALUES
-(2, 1, N'TOPUP_DEPOSIT', 300000, 500000, N'REC-DEP-20260715-031', DATEADD(day, -65, GETDATE()), N'Nạp thêm tiền cọc qua cổng VietQR PayOS để mượn đồng thời 5 cuốn'),
-(4, 2, N'TOPUP_DEPOSIT', 100000, 300000, N'REC-DEP-20260810-032', DATEADD(day, -40, GETDATE()), N'Nộp tiền mặt tại quầy nâng hạn mức mượn thêm sách chuyên khảo'),
-(5, 1, N'TOPUP_DEPOSIT', 200000, 400000, N'REC-DEP-20260818-033', DATEADD(day, -32, GETDATE()), N'Nạp thêm tiền cọc chuyển khoản VietQR'),
-(6, 2, N'TOPUP_DEPOSIT', 200000, 400000, N'REC-DEP-20260825-034', DATEADD(day, -25, GETDATE()), N'Nộp bổ sung tiền cọc tại quầy'),
-(11, 1, N'TOPUP_DEPOSIT', 800000, 1000000, N'REC-DEP-20260510-035', DATEADD(day, -130, GETDATE()), N'Nâng hạn mức cọc để mượn thêm tài liệu nghiên cứu'),
-(12, 1, N'TOPUP_DEPOSIT', 400000, 600000, N'REC-DEP-20260601-036', DATEADD(day, -110, GETDATE()), N'Nâng hạn mức cọc mượn tài liệu chuyên ngành'),
-(14, 2, N'TOPUP_DEPOSIT', 100000, 300000, N'REC-DEP-20260902-037', DATEADD(day, -17, GETDATE()), N'Nạp thêm tiền cọc tại quầy'),
-(16, 2, N'TOPUP_DEPOSIT', 100000, 300000, N'REC-DEP-20260908-038', DATEADD(day, -11, GETDATE()), N'Nạp thêm cọc chuyển khoản ngân hàng'),
-(19, 1, N'TOPUP_DEPOSIT', 200000, 400000, N'REC-DEP-20260912-039', DATEADD(day, -7, GETDATE()), N'Nạp cọc trực tuyến qua VietQR PayOS'),
-(24, 2, N'TOPUP_DEPOSIT', 300000, 500000, N'REC-DEP-20260915-040', DATEADD(day, -4, GETDATE()), N'Nộp tiền mặt nâng hạn mức cọc mượn sách');
+(2, 1, N'TOPUP_DEPOSIT', 300000, 500000, N'REC-DEP-20261110-031', '2026-11-10T14:00:00', N'Nạp thêm tiền cọc qua cổng VietQR PayOS để mượn đồng thời 5 cuốn'),
+(4, 2, N'TOPUP_DEPOSIT', 100000, 300000, N'REC-DEP-20261111-032', '2026-11-11T14:00:00', N'Nộp tiền mặt tại quầy nâng hạn mức mượn thêm sách chuyên khảo'),
+(5, 1, N'TOPUP_DEPOSIT', 200000, 400000, N'REC-DEP-20261112-033', '2026-11-12T14:00:00', N'Nạp thêm tiền cọc chuyển khoản VietQR'),
+(6, 2, N'TOPUP_DEPOSIT', 200000, 400000, N'REC-DEP-20261113-034', '2026-11-13T14:00:00', N'Nộp bổ sung tiền cọc tại quầy'),
+(11, 1, N'TOPUP_DEPOSIT', 800000, 1000000, N'REC-DEP-20261114-035', '2026-11-14T14:00:00', N'Nâng hạn mức cọc để mượn thêm tài liệu nghiên cứu'),
+(12, 1, N'TOPUP_DEPOSIT', 400000, 600000, N'REC-DEP-20261116-036', '2026-11-16T14:00:00', N'Nâng hạn mức cọc mượn tài liệu chuyên ngành'),
+(14, 2, N'TOPUP_DEPOSIT', 100000, 300000, N'REC-DEP-20261118-037', '2026-11-18T14:00:00', N'Nạp thêm tiền cọc tại quầy'),
+(16, 2, N'TOPUP_DEPOSIT', 100000, 300000, N'REC-DEP-20261120-038', '2026-11-20T14:00:00', N'Nạp thêm cọc chuyển khoản ngân hàng'),
+(19, 1, N'TOPUP_DEPOSIT', 200000, 400000, N'REC-DEP-20261124-039', '2026-11-24T14:00:00', N'Nạp cọc trực tuyến qua VietQR PayOS'),
+(24, 2, N'TOPUP_DEPOSIT', 300000, 500000, N'REC-DEP-20261128-040', '2026-11-28T14:00:00', N'Nộp tiền mặt nâng hạn mức cọc mượn sách');
 
 -- Giao dịch hoàn trả cọc (REFUND_DEPOSIT) khi độc giả đóng thẻ
 INSERT INTO dbo.DepositTransactions 
 (MemberId, HandledByUserId, TransactionType, Amount, BalanceAfter, ReceiptCode, TransactionDate, Notes) 
 VALUES
-(9, 1, N'REFUND_DEPOSIT', 200000, 0, N'REC-DEP-20260815-041', DATEADD(day, -35, GETDATE()), N'Tất toán hoàn trả 100% tiền cọc khi thành viên đóng thẻ'),
-(20, 1, N'REFUND_DEPOSIT', 500000, 0, N'REC-DEP-20260725-042', DATEADD(day, -55, GETDATE()), N'Tất toán hoàn cọc chuyển khoản khi thành viên thanh lý hợp đồng thẻ');
+(9, 1, N'REFUND_DEPOSIT', 200000, 0, N'REC-DEP-20261110-041', '2026-11-10T15:00:00', N'Tất toán hoàn trả 100% tiền cọc khi thành viên đóng thẻ'),
+(20, 1, N'REFUND_DEPOSIT', 500000, 0, N'REC-DEP-20261112-042', '2026-11-12T15:00:00', N'Tất toán hoàn cọc chuyển khoản khi thành viên thanh lý hợp đồng thẻ');
 GO
 
 -- 6.9. Ghi Biên Lai Thu Phí Dịch Vụ (ServiceFeeReceipts)
@@ -712,46 +734,46 @@ INSERT INTO dbo.ServiceFeeReceipts
 (ReceiptCode, MemberId, FeeType, Amount, PaymentMethod, PaymentDate, CollectedByUserId, Notes) 
 VALUES
 -- Thu phí phát hành thẻ mới cho 30 thành viên (50.000đ/thẻ)
-(N'FEE-20260520-001', 1, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -120, GETDATE()), 1, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260620-002', 2, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -90, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260630-003', 3, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -80, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260705-004', 4, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -75, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260720-005', 5, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -60, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260725-006', 6, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -55, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260730-007', 7, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -50, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260805-008', 8, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -45, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20250810-009', 9, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -400, GETDATE()), 1, N'Thu phí phát hành thẻ thành viên'),
-(N'FEE-20260810-010', 10, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -40, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260420-011', 11, N'CARD_ISSUANCE', 50000, N'BANK_TRANSFER', DATEADD(day, -150, GETDATE()), 1, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260502-012', 12, N'CARD_ISSUANCE', 50000, N'BANK_TRANSFER', DATEADD(day, -140, GETDATE()), 1, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260815-013', 13, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -35, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260820-014', 14, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -30, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20250901-015', 15, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -380, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên'),
-(N'FEE-20260822-016', 16, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -28, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260825-017', 17, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -25, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260828-018', 18, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -22, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260830-019', 19, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -20, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20250715-020', 20, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -420, GETDATE()), 1, N'Thu phí phát hành thẻ thành viên'),
-(N'FEE-20260901-021', 21, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -18, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260904-022', 22, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -15, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260905-023', 23, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -14, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260907-024', 24, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -12, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260710-025', 25, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -70, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260911-026', 26, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -8, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260913-027', 27, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -6, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20250910-028', 28, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -370, GETDATE()), 1, N'Thu phí phát hành thẻ thành viên'),
-(N'FEE-20260916-029', 29, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -3, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới'),
-(N'FEE-20260918-030', 30, N'CARD_ISSUANCE', 50000, N'CASH', DATEADD(day, -1, GETDATE()), 2, N'Thu phí phát hành thẻ thành viên mới');
+(N'FEE-20261101-001', 1, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-01T07:20:00', 1, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261101-002', 2, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-01T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261101-003', 3, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-01T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261102-004', 4, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-02T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261103-005', 5, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-03T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261104-006', 6, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-04T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261105-007', 7, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-05T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261106-008', 8, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-06T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20251108-009', 9, N'CARD_ISSUANCE', 50000, N'CASH', '2025-11-08T07:20:00', 1, N'Thu phí phát hành thẻ thành viên'),
+(N'FEE-20261107-010', 10, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-07T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261101-011', 11, N'CARD_ISSUANCE', 50000, N'BANK_TRANSFER', '2026-11-01T07:20:00', 1, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261102-012', 12, N'CARD_ISSUANCE', 50000, N'BANK_TRANSFER', '2026-11-02T07:20:00', 1, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261103-013', 13, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-03T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261104-014', 14, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-04T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20251116-015', 15, N'CARD_ISSUANCE', 50000, N'CASH', '2025-11-16T07:20:00', 2, N'Thu phí phát hành thẻ thành viên'),
+(N'FEE-20261105-016', 16, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-05T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261106-017', 17, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-06T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261107-018', 18, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-07T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261108-019', 19, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-08T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20251110-020', 20, N'CARD_ISSUANCE', 50000, N'CASH', '2025-11-10T07:20:00', 1, N'Thu phí phát hành thẻ thành viên'),
+(N'FEE-20261112-021', 21, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-12T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261114-022', 22, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-14T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261115-023', 23, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-15T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261116-024', 24, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-16T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261104-025', 25, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-04T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261120-026', 26, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-20T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261122-027', 27, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-22T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20251125-028', 28, N'CARD_ISSUANCE', 50000, N'CASH', '2025-11-25T07:20:00', 1, N'Thu phí phát hành thẻ thành viên'),
+(N'FEE-20261126-029', 29, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-26T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới'),
+(N'FEE-20261128-030', 30, N'CARD_ISSUANCE', 50000, N'CASH', '2026-11-28T07:20:00', 2, N'Thu phí phát hành thẻ thành viên mới');
 
 -- Thu phí dịch vụ gia hạn thẻ thường niên & cấp lại thẻ (CARD_RENEWAL / CARD_REISSUE)
 INSERT INTO dbo.ServiceFeeReceipts 
 (ReceiptCode, MemberId, FeeType, Amount, PaymentMethod, PaymentDate, CollectedByUserId, Notes) 
 VALUES
-(N'FEE-20260810-031', 1, N'CARD_RENEWAL', 50000, N'BANK_TRANSFER', DATEADD(day, -42, GETDATE()), 1, N'Thu phí gia hạn gói thẻ thành viên thường niên năm thứ 2'),
-(N'FEE-20260820-032', 5, N'CARD_RENEWAL', 50000, N'CASH', DATEADD(day, -30, GETDATE()), 2, N'Thu phí gia hạn gói thẻ thành viên thường niên'),
-(N'FEE-20260905-033', 11, N'CARD_RENEWAL', 50000, N'BANK_TRANSFER', DATEADD(day, -14, GETDATE()), 1, N'Thu phí gia hạn gói thẻ thành viên thường niên'),
-(N'FEE-20260912-034', 10, N'CARD_REISSUE', 50000, N'CASH', DATEADD(day, -7, GETDATE()), 2, N'Thu phí cấp lại thẻ mới do làm mất thẻ thư viện cũ'),
-(N'FEE-20260915-035', 4, N'CARD_REISSUE', 50000, N'CASH', DATEADD(day, -4, GETDATE()), 2, N'Thu phí cấp lại phôi thẻ từ mới');
+(N'FEE-20261110-031', 1, N'CARD_RENEWAL', 50000, N'BANK_TRANSFER', '2026-11-10T15:00:00', 1, N'Thu phí gia hạn gói thẻ thành viên thường niên năm thứ 2'),
+(N'FEE-20261115-032', 5, N'CARD_RENEWAL', 50000, N'CASH', '2026-11-15T15:00:00', 2, N'Thu phí gia hạn gói thẻ thành viên thường niên'),
+(N'FEE-20261122-033', 11, N'CARD_RENEWAL', 50000, N'BANK_TRANSFER', '2026-11-22T15:00:00', 1, N'Thu phí gia hạn gói thẻ thành viên thường niên'),
+(N'FEE-20261126-034', 10, N'CARD_REISSUE', 50000, N'CASH', '2026-11-26T15:00:00', 2, N'Thu phí cấp lại thẻ mới do làm mất thẻ thư viện cũ'),
+(N'FEE-20261127-035', 4, N'CARD_REISSUE', 50000, N'CASH', '2026-11-27T15:00:00', 2, N'Thu phí cấp lại phôi thẻ từ mới');
 GO
 
 -- 6.10. Chèn Danh Sách 35 Phiếu Mượn Sách (BorrowSlips: ID 1 -> 35)
@@ -759,45 +781,45 @@ INSERT INTO dbo.BorrowSlips
 (SlipCode, MemberId, CreatedByUserId, BorrowDate, DueDate, RenewalCount, Status, Notes) 
 VALUES
 -- [1-15]: Các phiếu mượn lịch sử đã hoàn trả xong (RETURNED)
-(N'PM202607-001', 1, 2, DATEADD(day, -50, GETDATE()), DATEADD(day, -36, GETDATE()), 0, N'RETURNED', N'Mượn sách kỹ thuật lập trình nâng cao'),
-(N'PM202607-002', 2, 2, DATEADD(day, -45, GETDATE()), DATEADD(day, -31, GETDATE()), 0, N'RETURNED', N'Mượn sách kinh tế tài chính'),
-(N'PM202608-003', 4, 1, DATEADD(day, -40, GETDATE()), DATEADD(day, -26, GETDATE()), 0, N'RETURNED', N'Mượn sách chuyên khảo y học'),
-(N'PM202608-004', 5, 2, DATEADD(day, -35, GETDATE()), DATEADD(day, -21, GETDATE()), 0, N'RETURNED', N'Mượn sách kiến trúc hệ thống dữ liệu'),
-(N'PM202608-005', 6, 2, DATEADD(day, -30, GETDATE()), DATEADD(day, -16, GETDATE()), 0, N'RETURNED', N'Mượn sách văn học nước ngoài'),
-(N'PM202608-006', 7, 2, DATEADD(day, -28, GETDATE()), DATEADD(day, -14, GETDATE()), 0, N'RETURNED', N'Mượn sách kỹ năng mềm'),
-(N'PM202608-007', 8, 2, DATEADD(day, -25, GETDATE()), DATEADD(day, -11, GETDATE()), 0, N'RETURNED', N'Mượn sách lịch sử & triết học'),
-(N'PM202608-008', 11, 1, DATEADD(day, -24, GETDATE()), DATEADD(day, -10, GETDATE()), 0, N'RETURNED', N'Thành viên mượn tài liệu nghiên cứu chuyên đề'),
-(N'PM202608-009', 12, 1, DATEADD(day, -22, GETDATE()), DATEADD(day, -8, GETDATE()), 0, N'RETURNED', N'Thành viên mượn sách kinh tế đầu tư chiến lược'),
-(N'PM202608-010', 13, 2, DATEADD(day, -20, GETDATE()), DATEADD(day, -6, GETDATE()), 0, N'RETURNED', N'Mượn sách khoa học máy tính'),
-(N'PM202608-011', 14, 2, DATEADD(day, -18, GETDATE()), DATEADD(day, -4, GETDATE()), 0, N'RETURNED', N'Mượn sách thiết kế UI/UX'),
-(N'PM202609-012', 16, 2, DATEADD(day, -16, GETDATE()), DATEADD(day, -2, GETDATE()), 0, N'RETURNED', N'Mượn sách y học thường thức'),
-(N'PM202609-013', 17, 2, DATEADD(day, -15, GETDATE()), DATEADD(day, -1, GETDATE()), 0, N'RETURNED', N'Mượn sách khoa học thiên văn'),
-(N'PM202609-014', 18, 2, DATEADD(day, -14, GETDATE()), GETDATE(), 0, N'RETURNED', N'Đã hoàn trả trong sáng hôm nay'),
-(N'PM202609-015', 19, 2, DATEADD(day, -12, GETDATE()), DATEADD(day, 2, GETDATE()), 0, N'RETURNED', N'Thành viên trả sớm trước hạn 2 ngày'),
+(N'PM202611-001', 1, 2, '2026-11-01T09:00:00', '2026-11-15T09:00:00', 0, N'RETURNED', N'Mượn sách kỹ thuật lập trình nâng cao'),
+(N'PM202611-002', 2, 2, '2026-11-02T09:00:00', '2026-11-16T09:00:00', 0, N'RETURNED', N'Mượn sách kinh tế tài chính'),
+(N'PM202611-003', 4, 1, '2026-11-03T09:00:00', '2026-11-17T09:00:00', 0, N'RETURNED', N'Mượn sách chuyên khảo y học'),
+(N'PM202611-004', 5, 2, '2026-11-04T09:00:00', '2026-11-18T09:00:00', 0, N'RETURNED', N'Mượn sách kiến trúc hệ thống dữ liệu'),
+(N'PM202611-005', 6, 2, '2026-11-05T09:00:00', '2026-11-19T09:00:00', 0, N'RETURNED', N'Mượn sách văn học nước ngoài'),
+(N'PM202611-006', 7, 2, '2026-11-06T09:00:00', '2026-11-20T09:00:00', 0, N'RETURNED', N'Mượn sách kỹ năng mềm'),
+(N'PM202611-007', 8, 2, '2026-11-07T09:00:00', '2026-11-21T09:00:00', 0, N'RETURNED', N'Mượn sách lịch sử & triết học'),
+(N'PM202611-008', 11, 1, '2026-11-08T09:00:00', '2026-11-22T09:00:00', 0, N'RETURNED', N'Thành viên mượn tài liệu nghiên cứu chuyên đề'),
+(N'PM202611-009', 12, 1, '2026-11-09T09:00:00', '2026-11-23T09:00:00', 0, N'RETURNED', N'Thành viên mượn sách kinh tế đầu tư chiến lược'),
+(N'PM202611-010', 13, 2, '2026-11-10T09:00:00', '2026-11-24T09:00:00', 0, N'RETURNED', N'Mượn sách khoa học máy tính'),
+(N'PM202611-011', 14, 2, '2026-11-11T09:00:00', '2026-11-25T09:00:00', 0, N'RETURNED', N'Mượn sách thiết kế UI/UX'),
+(N'PM202611-012', 16, 2, '2026-11-12T09:00:00', '2026-11-26T09:00:00', 0, N'RETURNED', N'Mượn sách y học thường thức'),
+(N'PM202611-013', 17, 2, '2026-11-13T09:00:00', '2026-11-27T09:00:00', 0, N'RETURNED', N'Mượn sách khoa học thiên văn'),
+(N'PM202611-014', 18, 2, '2026-11-14T09:00:00', '2026-11-28T09:00:00', 0, N'RETURNED', N'Đã hoàn trả ngày 28/11/2026'),
+(N'PM202611-015', 19, 2, '2026-11-15T09:00:00', '2026-11-29T09:00:00', 0, N'RETURNED', N'Thành viên trả sớm trước hạn 2 ngày'),
 
 -- [16-29]: Các phiếu mượn hiện hành đang hoạt động (BORROWING)
-(N'PM202609-016', 1, 2, DATEADD(day, -10, GETDATE()), DATEADD(day, 4, GETDATE()), 0, N'BORROWING', N'Mượn sách Clean Architecture phục vụ dự án công nghệ'),
-(N'PM202609-017', 2, 2, DATEADD(day, -8, GETDATE()), DATEADD(day, 6, GETDATE()), 0, N'BORROWING', N'Mượn sách Tâm lý học về tiền'),
-(N'PM202609-018', 4, 1, DATEADD(day, -7, GETDATE()), DATEADD(day, 7, GETDATE()), 0, N'BORROWING', N'Mượn sách Sao chúng ta lại ngủ & Cơ thể tự chữa lành'),
-(N'PM202609-019', 5, 2, DATEADD(day, -6, GETDATE()), DATEADD(day, 8, GETDATE()), 0, N'BORROWING', N'Mượn sách Designing Data-Intensive Applications'),
-(N'PM202609-020', 6, 2, DATEADD(day, -5, GETDATE()), DATEADD(day, 9, GETDATE()), 0, N'BORROWING', N'Mượn sách Luyện siêu trí nhớ từ vựng tiếng Anh'),
-(N'PM202609-021', 7, 2, DATEADD(day, -5, GETDATE()), DATEADD(day, 9, GETDATE()), 0, N'BORROWING', N'Mượn sách Chiến lược đại dương xanh'),
-(N'PM202609-022', 8, 2, DATEADD(day, -4, GETDATE()), DATEADD(day, 10, GETDATE()), 0, N'BORROWING', N'Mượn tiểu thuyết Rừng Na Uy'),
-(N'PM202609-023', 11, 1, DATEADD(day, -4, GETDATE()), DATEADD(day, 17, GETDATE()), 1, N'BORROWING', N'Thành viên đã gia hạn thêm 7 ngày (RenewalCount=1)'),
-(N'PM202609-024', 13, 2, DATEADD(day, -3, GETDATE()), DATEADD(day, 11, GETDATE()), 0, N'BORROWING', N'Mượn sách The Pragmatic Programmer'),
-(N'PM202609-025', 14, 2, DATEADD(day, -3, GETDATE()), DATEADD(day, 11, GETDATE()), 0, N'BORROWING', N'Mượn sách Thiết kế cho cuộc sống & Đừng bắt tôi phải nghĩ'),
-(N'PM202609-026', 16, 2, DATEADD(day, -2, GETDATE()), DATEADD(day, 12, GETDATE()), 0, N'BORROWING', N'Mượn sách Nhân tố Enzyme'),
-(N'PM202609-027', 21, 2, DATEADD(day, -2, GETDATE()), DATEADD(day, 12, GETDATE()), 0, N'BORROWING', N'Thành viên mượn sách Clean Code'),
-(N'PM202609-028', 22, 2, DATEADD(day, -1, GETDATE()), DATEADD(day, 13, GETDATE()), 0, N'BORROWING', N'Mượn sách Đắc nhân tâm'),
-(N'PM202609-029', 24, 2, GETDATE(), DATEADD(day, 14, GETDATE()), 0, N'BORROWING', N'Mượn sách Nhà đầu tư thông minh & Zero to One'),
+(N'PM202611-016', 1, 2, '2026-11-17T09:00:00', '2026-12-01T09:00:00', 0, N'BORROWING', N'Mượn sách Clean Architecture phục vụ dự án công nghệ'),
+(N'PM202611-017', 2, 2, '2026-11-18T09:00:00', '2026-12-02T09:00:00', 0, N'BORROWING', N'Mượn sách Tâm lý học về tiền'),
+(N'PM202611-018', 4, 1, '2026-11-19T09:00:00', '2026-12-03T09:00:00', 0, N'BORROWING', N'Mượn sách Sao chúng ta lại ngủ & Cơ thể tự chữa lành'),
+(N'PM202611-019', 5, 2, '2026-11-20T09:00:00', '2026-12-04T09:00:00', 0, N'BORROWING', N'Mượn sách Designing Data-Intensive Applications'),
+(N'PM202611-020', 6, 2, '2026-11-21T09:00:00', '2026-12-05T09:00:00', 0, N'BORROWING', N'Mượn sách Luyện siêu trí nhớ từ vựng tiếng Anh'),
+(N'PM202611-021', 7, 2, '2026-11-22T09:00:00', '2026-12-06T09:00:00', 0, N'BORROWING', N'Mượn sách Chiến lược đại dương xanh'),
+(N'PM202611-022', 8, 2, '2026-11-23T09:00:00', '2026-12-07T09:00:00', 0, N'BORROWING', N'Mượn tiểu thuyết Rừng Na Uy'),
+(N'PM202611-023', 11, 1, '2026-11-24T09:00:00', '2026-12-15T09:00:00', 1, N'BORROWING', N'Thành viên đã gia hạn thêm 7 ngày (RenewalCount=1)'),
+(N'PM202611-024', 13, 2, '2026-11-25T09:00:00', '2026-12-09T09:00:00', 0, N'BORROWING', N'Mượn sách The Pragmatic Programmer'),
+(N'PM202611-025', 14, 2, '2026-11-26T09:00:00', '2026-12-10T09:00:00', 0, N'BORROWING', N'Mượn sách Thiết kế cho cuộc sống & Đừng bắt tôi phải nghĩ'),
+(N'PM202611-026', 16, 2, '2026-11-27T09:00:00', '2026-12-11T09:00:00', 0, N'BORROWING', N'Mượn sách Nhân tố Enzyme'),
+(N'PM202611-027', 21, 2, '2026-11-28T09:00:00', '2026-12-12T09:00:00', 0, N'BORROWING', N'Thành viên mượn sách Clean Code'),
+(N'PM202611-028', 22, 2, '2026-11-29T09:00:00', '2026-12-13T09:00:00', 0, N'BORROWING', N'Mượn sách Đắc nhân tâm'),
+(N'PM202611-029', 24, 2, '2026-11-30T09:00:00', '2026-12-14T09:00:00', 0, N'BORROWING', N'Mượn sách Nhà đầu tư thông minh & Zero to One'),
 
--- [30-35]: Các phiếu mượn trễ hạn cần thu hồi (OVERDUE)
-(N'PM202608-030', 3, 2, DATEADD(day, -25, GETDATE()), DATEADD(day, -11, GETDATE()), 0, N'OVERDUE', N'Quá hạn 11 ngày - Đã gửi email thông báo tự động lần 2'),
-(N'PM202608-031', 15, 2, DATEADD(day, -28, GETDATE()), DATEADD(day, -14, GETDATE()), 0, N'OVERDUE', N'Quá hạn 14 ngày - Thủ thư đã gọi điện đôn đốc'),
-(N'PM202608-032', 25, 2, DATEADD(day, -35, GETDATE()), DATEADD(day, -21, GETDATE()), 0, N'OVERDUE', N'Quá hạn 21 ngày - Thẻ đã bị hệ thống tự động khóa'),
-(N'PM202609-033', 17, 2, DATEADD(day, -18, GETDATE()), DATEADD(day, -4, GETDATE()), 0, N'OVERDUE', N'Quá hạn 4 ngày - Phí phạt tích lũy 20.000đ'),
-(N'PM202609-034', 18, 2, DATEADD(day, -16, GETDATE()), DATEADD(day, -2, GETDATE()), 0, N'OVERDUE', N'Quá hạn 2 ngày - Thành viên xin trả vào cuối tuần'),
-(N'PM202609-035', 23, 2, DATEADD(day, -15, GETDATE()), DATEADD(day, -1, GETDATE()), 0, N'OVERDUE', N'Quá hạn 1 ngày');
+-- [30-35]: Các phiếu mượn trễ hạn cần thu hồi tại ngày 30/11/2026 (OVERDUE)
+(N'PM202611-030', 3, 2, '2026-11-01T09:00:00', '2026-11-15T09:00:00', 0, N'OVERDUE', N'Quá hạn 15 ngày tại mốc dữ liệu 30/11/2026; cần liên hệ độc giả thu hồi sách'),
+(N'PM202611-031', 15, 2, '2026-11-03T09:00:00', '2026-11-17T09:00:00', 0, N'OVERDUE', N'Quá hạn 13 ngày tại mốc dữ liệu 30/11/2026; cần liên hệ độc giả thu hồi sách'),
+(N'PM202611-032', 25, 2, '2026-11-05T09:00:00', '2026-11-19T09:00:00', 0, N'OVERDUE', N'Quá hạn 11 ngày tại mốc dữ liệu 30/11/2026; cần liên hệ độc giả thu hồi sách'),
+(N'PM202611-033', 17, 2, '2026-11-08T09:00:00', '2026-11-22T09:00:00', 0, N'OVERDUE', N'Quá hạn 8 ngày tại mốc dữ liệu 30/11/2026; cần liên hệ độc giả thu hồi sách'),
+(N'PM202611-034', 18, 2, '2026-11-12T09:00:00', '2026-11-26T09:00:00', 0, N'OVERDUE', N'Quá hạn 4 ngày tại mốc dữ liệu 30/11/2026; cần liên hệ độc giả thu hồi sách'),
+(N'PM202611-035', 23, 2, '2026-11-15T09:00:00', '2026-11-29T09:00:00', 0, N'OVERDUE', N'Quá hạn 1 ngày tại mốc dữ liệu 30/11/2026; cần liên hệ độc giả thu hồi sách');
 GO
 
 -- 6.11. Chèn Chi Tiết Phiếu Mượn Sách (BorrowSlipDetails: ID 1 -> 58)
@@ -859,37 +881,37 @@ GO
 INSERT INTO dbo.ReturnSlipDetails 
 (BorrowSlipDetailId, ReceivedByUserId, ActualReturnDate, OverdueDays, FineAmount, ReturnConditionNote, BookCopyStatusAfterReturn) 
 VALUES
-(1, 2, DATEADD(day, -38, GETDATE()), 0, 0, N'Sách trả đúng hạn, nguyên vẹn 100%', N'AVAILABLE'),
-(2, 2, DATEADD(day, -38, GETDATE()), 0, 0, N'Sách trả đúng hạn, bìa tốt', N'AVAILABLE'),
-(3, 2, DATEADD(day, -32, GETDATE()), 0, 0, N'Sách trả đúng hạn, không hư hại', N'AVAILABLE'),
-(4, 1, DATEADD(day, -27, GETDATE()), 0, 0, N'Sách y học nguyên vẹn', N'AVAILABLE'),
-(5, 2, DATEADD(day, -22, GETDATE()), 0, 0, N'Sách trả đúng hạn, tình trạng hoàn hảo', N'AVAILABLE'),
-(6, 2, DATEADD(day, -17, GETDATE()), 0, 0, N'Sách nguyên vẹn', N'AVAILABLE'),
-(7, 2, DATEADD(day, -17, GETDATE()), 0, 0, N'Sách nguyên vẹn', N'AVAILABLE'),
-(8, 2, DATEADD(day, -15, GETDATE()), 0, 0, N'Sách trả đúng hạn', N'AVAILABLE'),
-(9, 2, DATEADD(day, -12, GETDATE()), 0, 0, N'Sách nguyên vẹn', N'AVAILABLE'),
-(10, 1, DATEADD(day, -11, GETDATE()), 0, 0, N'Thành viên trả đúng hạn', N'AVAILABLE'),
-(11, 1, DATEADD(day, -11, GETDATE()), 0, 0, N'Thành viên trả đúng hạn', N'AVAILABLE'),
-(12, 1, DATEADD(day, -9, GETDATE()), 0, 0, N'Sách kinh tế trả đúng hạn', N'AVAILABLE'),
-(13, 2, DATEADD(day, -7, GETDATE()), 0, 0, N'Sách CNTT nguyên vẹn', N'AVAILABLE'),
-(14, 2, DATEADD(day, -5, GETDATE()), 0, 0, N'Sách thiết kế nguyên vẹn', N'AVAILABLE'),
-(15, 2, DATEADD(day, -3, GETDATE()), 0, 0, N'Sách y học nguyên vẹn', N'AVAILABLE'),
-(16, 2, DATEADD(day, -2, GETDATE()), 0, 0, N'Sách vũ trụ học nguyên vẹn', N'AVAILABLE'),
-(17, 2, GETDATE(), 0, 0, N'Sách văn học trả đúng hạn trong ngày', N'AVAILABLE'),
-(18, 2, GETDATE(), 0, 0, N'Sách văn học trả đúng hạn trong ngày', N'AVAILABLE'),
-(19, 2, DATEADD(day, -1, GETDATE()), 0, 0, N'Thành viên trả trước hạn 2 ngày, sách rất mới', N'AVAILABLE');
+(1, 2, '2026-11-04T15:00:00', 0, 0, N'Sách trả đúng hạn, nguyên vẹn 100%', N'AVAILABLE'),
+(2, 2, '2026-11-04T15:00:00', 0, 0, N'Sách trả đúng hạn, bìa tốt', N'AVAILABLE'),
+(3, 2, '2026-11-06T15:00:00', 0, 0, N'Sách trả đúng hạn, không hư hại', N'AVAILABLE'),
+(4, 1, '2026-11-08T15:00:00', 0, 0, N'Sách y học nguyên vẹn', N'AVAILABLE'),
+(5, 2, '2026-11-10T15:00:00', 0, 0, N'Sách trả đúng hạn, tình trạng hoàn hảo', N'AVAILABLE'),
+(6, 2, '2026-11-12T15:00:00', 0, 0, N'Sách nguyên vẹn', N'AVAILABLE'),
+(7, 2, '2026-11-12T15:00:00', 0, 0, N'Sách nguyên vẹn', N'AVAILABLE'),
+(8, 2, '2026-11-14T15:00:00', 0, 0, N'Sách trả đúng hạn', N'AVAILABLE'),
+(9, 2, '2026-11-16T15:00:00', 0, 0, N'Sách nguyên vẹn', N'AVAILABLE'),
+(10, 1, '2026-11-18T15:00:00', 0, 0, N'Thành viên trả đúng hạn', N'AVAILABLE'),
+(11, 1, '2026-11-18T15:00:00', 0, 0, N'Thành viên trả đúng hạn', N'AVAILABLE'),
+(12, 1, '2026-11-20T15:00:00', 0, 0, N'Sách kinh tế trả đúng hạn', N'AVAILABLE'),
+(13, 2, '2026-11-22T15:00:00', 0, 0, N'Sách CNTT nguyên vẹn', N'AVAILABLE'),
+(14, 2, '2026-11-23T15:00:00', 0, 0, N'Sách thiết kế nguyên vẹn', N'AVAILABLE'),
+(15, 2, '2026-11-24T15:00:00', 0, 0, N'Sách y học nguyên vẹn', N'AVAILABLE'),
+(16, 2, '2026-11-26T15:00:00', 0, 0, N'Sách vũ trụ học nguyên vẹn', N'AVAILABLE'),
+(17, 2, '2026-11-28T15:00:00', 0, 0, N'Sách văn học trả đúng hạn trong ngày', N'AVAILABLE'),
+(18, 2, '2026-11-28T15:00:00', 0, 0, N'Sách văn học trả đúng hạn trong ngày', N'AVAILABLE'),
+(19, 2, '2026-11-27T15:00:00', 0, 0, N'Thành viên trả trước hạn 2 ngày, sách rất mới', N'AVAILABLE');
 GO
 
 -- 6.13. Chèn Biên Lai Thu Tiền Phạt Xử Lý Vi Phạm (FineReceipts)
 INSERT INTO dbo.FineReceipts 
 (ReceiptCode, MemberId, BorrowSlipId, CollectedByUserId, TotalAmount, PaymentMethod, Reason, PaymentDate, Notes) 
 VALUES
-(N'REC-FINE-20260715-001', 3, 1, 2, 15000, N'DEPOSIT_DEDUCTION', N'Phạt quá hạn 3 ngày (5.000đ/ngày)', DATEADD(day, -35, GETDATE()), N'Đã cấn trừ trực tiếp vào tiền cọc thành viên'),
-(N'REC-FINE-20260802-002', 15, 3, 2, 25000, N'DEPOSIT_DEDUCTION', N'Phạt quá hạn 5 ngày (5.000đ/ngày)', DATEADD(day, -20, GETDATE()), N'Khấu trừ vào số dư cọc của thẻ'),
-(N'REC-FINE-20260818-003', 1, NULL, 1, 40000, N'CASH', N'Phạt làm rách nhẹ trang bìa sách Văn học Việt Nam', DATEADD(day, -15, GETDATE()), N'Thành viên đã nộp tiền mặt khắc phục tại quầy'),
-(N'REC-FINE-20260825-004', 8, NULL, 2, 20000, N'CASH', N'Phạt viết bút chì ghi chú vào ruột sách Lịch sử', DATEADD(day, -10, GETDATE()), N'Thành viên đã tẩy xóa và nộp phạt tại quầy'),
-(N'REC-FINE-20260905-005', 25, 32, 2, 50000, N'DEPOSIT_DEDUCTION', N'Phạt quá hạn 10 ngày mượn sách Triết học', DATEADD(day, -5, GETDATE()), N'Ghi nhận công nợ và tạm khóa thẻ'),
-(N'REC-FINE-20260912-006', 7, NULL, 2, 30000, N'CASH', N'Phạt làm bẩn ố nhẹ mép sách Kỹ năng mềm', DATEADD(day, -2, GETDATE()), N'Thành viên nộp tiền mặt');
+(N'REC-FINE-20261118-001', 3, 1, 2, 15000, N'DEPOSIT_DEDUCTION', N'Phạt quá hạn 3 ngày (5.000đ/ngày)', '2026-11-18T16:00:00', N'Đã cấn trừ trực tiếp vào tiền cọc thành viên'),
+(N'REC-FINE-20261122-002', 15, 3, 2, 25000, N'DEPOSIT_DEDUCTION', N'Phạt quá hạn 5 ngày (5.000đ/ngày)', '2026-11-22T16:00:00', N'Khấu trừ vào số dư cọc của thẻ'),
+(N'REC-FINE-20261123-003', 1, NULL, 1, 40000, N'CASH', N'Phạt làm rách nhẹ trang bìa sách Văn học Việt Nam', '2026-11-23T16:00:00', N'Thành viên đã nộp tiền mặt khắc phục tại quầy'),
+(N'REC-FINE-20261124-004', 8, NULL, 2, 20000, N'CASH', N'Phạt viết bút chì ghi chú vào ruột sách Lịch sử', '2026-11-24T16:00:00', N'Thành viên đã tẩy xóa và nộp phạt tại quầy'),
+(N'REC-FINE-20261129-005', 25, 32, 2, 50000, N'DEPOSIT_DEDUCTION', N'Phạt quá hạn 10 ngày mượn sách Triết học', '2026-11-29T16:00:00', N'Ghi nhận công nợ và tạm khóa thẻ'),
+(N'REC-FINE-20261130-006', 7, NULL, 2, 30000, N'CASH', N'Phạt làm bẩn ố nhẹ mép sách Kỹ năng mềm', '2026-11-30T16:00:00', N'Thành viên nộp tiền mặt');
 GO
 
 -- 6.14. Chèn Danh Sách Yêu Cầu Cổng Thành Viên Tự Phục Vụ (ReaderRequests)
@@ -897,25 +919,25 @@ INSERT INTO dbo.ReaderRequests
 (RequestCode, MemberId, RequestType, Status, Amount, PayoutMethod, BankName, BankAccountNumber, BankAccountHolder, Reason, RequestDate, ProcessedByUserId, ProcessedDate, StaffNotes) 
 VALUES
 -- 1. Yêu cầu hủy thẻ & rút cọc (CANCEL_CARD)
-(N'RQ202609-001', 2, N'CANCEL_CARD', N'PENDING', 500000, N'BANK_TRANSFER', N'Vietcombank', N'0011004567890', N'TRAN THI MAI ANH', N'Tôi chuẩn bị chuyển công tác sang TP.HCM nên xin đóng thẻ và rút lại toàn bộ số dư tiền cọc.', DATEADD(hour, -6, GETDATE()), NULL, NULL, NULL),
-(N'RQ202608-002', 9, N'CANCEL_CARD', N'APPROVED', 200000, N'BANK_TRANSFER', N'MB Bank', N'0911778809001', N'HOANG VAN TUAN', N'Thành viên chuyển nơi định cư, xin thanh lý thẻ và nhận lại tiền cọc.', DATEADD(day, -36, GETDATE()), 1, DATEADD(day, -35, GETDATE()), N'Đã đối soát 0 nợ, 0 sách mượn. Chuyển khoản hoàn cọc thành công.'),
-(N'RQ202607-003', 20, N'CANCEL_CARD', N'APPROVED', 500000, N'BANK_TRANSFER', N'Techcombank', N'19034567890012', N'PHAN THANH BINH', N'Đã hoàn tất dự án nghiên cứu thị trường độc lập, xin tất toán hợp đồng và rút cọc.', DATEADD(day, -56, GETDATE()), 1, DATEADD(day, -55, GETDATE()), N'Đã hoàn cọc chuyển khoản qua Techcombank.'),
+(N'RQ202611-001', 2, N'CANCEL_CARD', N'PENDING', 500000, N'BANK_TRANSFER', N'Vietcombank', N'0011004567890', N'TRAN THI MAI ANH', N'Tôi chuẩn bị chuyển công tác sang TP.HCM nên xin đóng thẻ và rút lại toàn bộ số dư tiền cọc.', '2026-11-30T10:00:00', NULL, NULL, NULL),
+(N'RQ202611-002', 9, N'CANCEL_CARD', N'APPROVED', 200000, N'BANK_TRANSFER', N'MB Bank', N'0911778809001', N'HOANG VAN TUAN', N'Thành viên chuyển nơi định cư, xin thanh lý thẻ và nhận lại tiền cọc.', '2026-11-09T10:00:00', 1, '2026-11-10T15:00:00', N'Đã đối soát 0 nợ, 0 sách mượn. Chuyển khoản hoàn cọc thành công.'),
+(N'RQ202611-003', 20, N'CANCEL_CARD', N'APPROVED', 500000, N'BANK_TRANSFER', N'Techcombank', N'19034567890012', N'PHAN THANH BINH', N'Đã hoàn tất dự án nghiên cứu thị trường độc lập, xin tất toán hợp đồng và rút cọc.', '2026-11-11T10:00:00', 1, '2026-11-12T15:00:00', N'Đã hoàn cọc chuyển khoản qua Techcombank.'),
 
 -- 2. Yêu cầu báo mất thẻ & xin cấp lại phôi thẻ mới (REISSUE_CARD)
-(N'RQ202609-004', 10, N'REISSUE_CARD', N'PENDING', 50000, N'CASH', NULL, NULL, NULL, N'Tôi để quên thẻ thành viên trên xe taxi, xin cấp lại phôi thẻ mới và bảo lưu thông tin tài khoản.', DATEADD(hour, -3, GETDATE()), NULL, NULL, NULL),
-(N'RQ202609-005', 4, N'REISSUE_CARD', N'APPROVED', 50000, N'CASH', NULL, NULL, NULL, N'Thẻ bị gãy chip từ không quét được qua cổng kiểm soát ra vào.', DATEADD(day, -5, GETDATE()), 2, DATEADD(day, -4, GETDATE()), N'Đã in phôi thẻ mới và trao tại quầy dịch vụ thư viện.'),
+(N'RQ202611-004', 10, N'REISSUE_CARD', N'PENDING', 50000, N'CASH', NULL, NULL, NULL, N'Tôi để quên thẻ thành viên trên xe taxi, xin cấp lại phôi thẻ mới và bảo lưu thông tin tài khoản.', '2026-11-30T10:00:00', NULL, NULL, NULL),
+(N'RQ202611-005', 4, N'REISSUE_CARD', N'APPROVED', 50000, N'CASH', NULL, NULL, NULL, N'Thẻ bị gãy chip từ không quét được qua cổng kiểm soát ra vào.', '2026-11-26T10:00:00', 2, '2026-11-27T15:00:00', N'Đã in phôi thẻ mới và trao tại quầy dịch vụ thư viện.'),
 
 -- 3. Yêu cầu cập nhật thông tin cá nhân & CCCD (UPDATE_INFO)
-(N'RQ202609-006', 1, N'UPDATE_INFO', N'APPROVED', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Cập nhật địa chỉ thường trú mới tại Hoàng Mai và số điện thoại liên lạc bổ sung.', DATEADD(day, -3, GETDATE()), 2, DATEADD(day, -2, GETDATE()), N'Đã xác minh và cập nhật vào hồ sơ thành viên.'),
-(N'RQ202609-007', 13, N'UPDATE_INFO', N'PENDING', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Tôi vừa đổi sang thẻ Căn cước mới gắn chip, xin cập nhật số định danh.', DATEADD(hour, -12, GETDATE()), NULL, NULL, NULL),
+(N'RQ202611-006', 1, N'UPDATE_INFO', N'APPROVED', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Cập nhật địa chỉ thường trú mới tại Hoàng Mai và số điện thoại liên lạc bổ sung.', '2026-11-27T10:00:00', 2, '2026-11-28T15:00:00', N'Đã xác minh và cập nhật vào hồ sơ thành viên.'),
+(N'RQ202611-007', 13, N'UPDATE_INFO', N'PENDING', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Tôi vừa đổi sang thẻ Căn cước mới gắn chip, xin cập nhật số định danh.', '2026-11-30T10:00:00', NULL, NULL, NULL),
 
 -- 4. Yêu cầu xin gia hạn lượt mượn sách trực tuyến (BORROW_EXTEND)
-(N'RQ202609-008', 11, N'BORROW_EXTEND', N'APPROVED', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Thành viên xin gia hạn thêm 7 ngày cuốn Clean Architecture để hoàn thiện tài liệu dự án.', DATEADD(day, -5, GETDATE()), 1, DATEADD(day, -4, GETDATE()), N'Duyệt gia hạn thành công thêm 7 ngày (Phiếu PM202609-023).'),
-(N'RQ202609-009', 3, N'BORROW_EXTEND', N'REJECTED', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Xin gia hạn phiếu mượn sách quá hạn.', DATEADD(day, -6, GETDATE()), 2, DATEADD(day, -5, GETDATE()), N'Từ chối do phiếu mượn đã quá hạn quy định. Thành viên vui lòng mang sách tới quầy để trả và nộp phạt trễ hạn.'),
+(N'RQ202611-008', 11, N'BORROW_EXTEND', N'APPROVED', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Thành viên xin gia hạn thêm 7 ngày cuốn Clean Architecture để hoàn thiện tài liệu dự án.', '2026-11-24T10:00:00', 1, '2026-11-24T15:00:00', N'Duyệt gia hạn thành công thêm 7 ngày (Phiếu PM202611-023).'),
+(N'RQ202611-009', 3, N'BORROW_EXTEND', N'REJECTED', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Xin gia hạn phiếu mượn sách quá hạn.', '2026-11-20T10:00:00', 2, '2026-11-21T15:00:00', N'Từ chối do phiếu mượn đã quá hạn quy định. Thành viên vui lòng mang sách tới quầy để trả và nộp phạt trễ hạn.'),
 
 -- 5. Yêu cầu góp ý & Đề xuất bổ sung đầu sách mới (FEEDBACK_INQUIRY)
-(N'RQ202609-010', 5, N'FEEDBACK_INQUIRY', N'APPROVED', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Kính đề xuất không gian thư viện bổ sung thêm đầu sách chuyên môn: Kubernetes in Action và Microservices Patterns.', DATEADD(day, -8, GETDATE()), 1, DATEADD(day, -6, GETDATE()), N'Đã chuyển danh mục đề xuất sách cho Ban Thư viện phê duyệt mua sắm Quý 4.'),
-(N'RQ202609-011', 19, N'FEEDBACK_INQUIRY', N'PENDING', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Đề xuất thư viện bổ sung thêm ổ cắm điện và khu vực co-working yên tĩnh tại Tầng 3.', DATEADD(day, -1, GETDATE()), NULL, NULL, NULL);
+(N'RQ202611-010', 5, N'FEEDBACK_INQUIRY', N'APPROVED', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Kính đề xuất không gian thư viện bổ sung thêm đầu sách chuyên môn: Kubernetes in Action và Microservices Patterns.', '2026-11-17T10:00:00', 1, '2026-11-19T15:00:00', N'Đã chuyển danh mục đề xuất sách cho Ban Thư viện phê duyệt mua sắm Quý 4.'),
+(N'RQ202611-011', 19, N'FEEDBACK_INQUIRY', N'PENDING', 0, N'BANK_TRANSFER', NULL, NULL, NULL, N'Đề xuất thư viện bổ sung thêm ổ cắm điện và khu vực co-working yên tĩnh tại Tầng 3.', '2026-11-29T10:00:00', NULL, NULL, NULL);
 GO
 
 -- 6.15. Cập Nhật Đồng Bộ Trạng Thái BookCopies và Số Lượng Sách (Books)
@@ -947,5 +969,4 @@ SET b.AvailableQuantity = (
 )
 FROM dbo.Books b;
 GO
-
 
