@@ -2,12 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        Title="Chi tiết yêu cầu tự phục vụ" 
+        Title="{DynamicResource ApplicationWindowTitle}"
         Height="600" Width="560"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        WindowStyle="None"
-        AllowsTransparency="True"
         Background="Transparent"
         FontFamily="Segoe UI">
 

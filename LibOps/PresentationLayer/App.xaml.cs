@@ -20,10 +20,14 @@ namespace LibOps.PresentationLayer
             bool keepRunning = true;
             while (keepRunning)
             {
+                Resources["ApplicationWindowTitle"] = "LibOps - Hệ Thống Quản Lý Thư Viện";
                 var loginView = new LoginView();
                 if (loginView.ShowDialog() == true && loginView.LoggedInSession != null)
                 {
                     var session = loginView.LoggedInSession;
+                    Resources["ApplicationWindowTitle"] = session.IsReader
+                        ? "LibOps - Thư Viện Hiện Đại"
+                        : "LibOps - Hệ Thống Quản Lý Thư Viện";
                     if (session.IsReader)
                     {
                         var readerDashboard = new ReaderDashboardView(session);

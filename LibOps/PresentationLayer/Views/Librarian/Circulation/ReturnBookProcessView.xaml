@@ -33,7 +33,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="Quét mã vạch sách trả: " FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <TextBlock Grid.Column="0" Text="Nhập mã sách mượn: " FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
                 <TextBox Grid.Column="1" Text="{Binding ReturnBarcode, UpdateSourceTrigger=PropertyChanged}" Height="36" />
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="8,0,0,0">
                     <Button Style="{StaticResource SuccessButton}" Height="36" Command="{Binding AddBarcodeCommand}">

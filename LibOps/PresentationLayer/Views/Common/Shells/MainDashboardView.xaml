@@ -5,7 +5,7 @@
         xmlns:views="clr-namespace:LibOps.PresentationLayer.Views"
         xmlns:converters="clr-namespace:LibOps.PresentationLayer.Converters"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        Title="LibOps - Hệ Thống Quản Lý Thư Viện Hiện Đại"
+        Title="{DynamicResource ApplicationWindowTitle}"
         Height="800" Width="1280"
         MinHeight="700" MinWidth="1050"
         WindowStartupLocation="CenterScreen"

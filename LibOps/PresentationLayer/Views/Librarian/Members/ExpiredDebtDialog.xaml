@@ -7,7 +7,7 @@
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:ExpiredDebtViewModel}"
-        Title="Đối Soát Và Cấn Trừ Nợ Thẻ Hết Hạn" 
+        Title="{DynamicResource ApplicationWindowTitle}"
         Height="700" Width="1140"
         MinHeight="580" MinWidth="960"
         WindowStartupLocation="CenterScreen"
